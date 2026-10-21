@@ -2,4 +2,4 @@
 
 import { Cli } from "./Cli.js";
 
-new Cli().start();
+await new Cli().start();
