@@ -1,5 +1,9 @@
 import { PrimitiveShape } from "./PrimitiveShape.js";
-import { Shape } from "./Shape.js";
+import {
+  Shape,
+  type Point,
+  type ShapeAttribute,
+} from "./Shape.js";
 
 export class Ellipse extends PrimitiveShape {
   private cxValue: number;
@@ -75,6 +79,29 @@ export class Ellipse extends PrimitiveShape {
       this.stroke,
       this.strokeWidth,
     );
+  }
+
+  public override getPosition(): Point {
+    return { x: this.cxValue, y: this.cyValue };
+  }
+
+  public override getTreeSummary(): string {
+    return [
+      `cx=${this.cxValue}`,
+      `cy=${this.cyValue}`,
+      `rx=${this.radiusXValue}`,
+      `ry=${this.radiusYValue}`,
+    ].join(" ") + this.styleSummary();
+  }
+
+  public override getShowAttributes(): readonly ShapeAttribute[] {
+    return [
+      { name: "cx", value: this.cxValue.toString() },
+      { name: "cy", value: this.cyValue.toString() },
+      { name: "rx", value: this.radiusXValue.toString() },
+      { name: "ry", value: this.radiusYValue.toString() },
+      ...this.getCommonAttributes(),
+    ];
   }
 
   protected override setTypeAttribute(

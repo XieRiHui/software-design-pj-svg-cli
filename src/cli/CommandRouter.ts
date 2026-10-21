@@ -1,4 +1,10 @@
 import { type Editor } from "../application/Editor.js";
+import { CreateCommand } from "../application/commands/CreateCommand.js";
+import { DeleteCommand } from "../application/commands/DeleteCommand.js";
+import { MoveCommand } from "../application/commands/MoveCommand.js";
+import { ScaleCommand } from "../application/commands/ScaleCommand.js";
+import { SetCommand } from "../application/commands/SetCommand.js";
+import { type CanvasDocument } from "../domain/CanvasDocument.js";
 import { EditorError } from "../shared/EditorError.js";
 import { type ParsedCommand } from "./CommandParser.js";
 import { OutputFormatter } from "./OutputFormatter.js";
@@ -37,6 +43,24 @@ export class CommandRouter {
         return this.showHelp(command);
       case "init":
         return this.initializeDocument(command);
+      case "create":
+        return this.createShape(command);
+      case "delete":
+        return this.deleteShape(command);
+      case "move":
+        return this.moveShape(command);
+      case "scale":
+        return this.scaleShape(command);
+      case "set":
+        return this.setAttribute(command);
+      case "tree":
+        return this.showTree(command);
+      case "show":
+        return this.showShape(command);
+      case "undo":
+        return this.undo(command);
+      case "redo":
+        return this.redo(command);
       default:
         return this.rejectUnavailableCommand(command);
     }
@@ -82,16 +106,231 @@ export class CommandRouter {
     return dimension;
   }
 
+  private createShape(command: ParsedCommand): string {
+    this.requireDocument();
+    if (command.args.length < 2) {
+      throw new EditorError(
+        "usage: create <type> <id> [params...] [in <containerId>]",
+      );
+    }
+
+    const [shapeType, shapeId, ...parameters] = command.args;
+    if (shapeType === undefined || shapeId === undefined) {
+      throw new EditorError(
+        "usage: create <type> <id> [params...] [in <containerId>]",
+      );
+    }
+
+    const result = this.editor.execute(
+      new CreateCommand(
+        shapeType,
+        shapeId,
+        parameters,
+        command.containerId,
+      ),
+    );
+
+    return this.formatter.editResult(
+      result,
+      this.requireDocument(),
+      "execute",
+    );
+  }
+
+  private deleteShape(command: ParsedCommand): string {
+    this.requireDocument();
+    this.requireArgumentCount(command, 1, "delete <id>");
+    const id = command.args[0];
+    if (id === undefined) {
+      throw new EditorError("usage: delete <id>");
+    }
+
+    const result = this.editor.execute(new DeleteCommand(id));
+    return this.formatter.editResult(
+      result,
+      this.requireDocument(),
+      "execute",
+    );
+  }
+
+  private moveShape(command: ParsedCommand): string {
+    this.requireDocument();
+    this.requireArgumentCount(
+      command,
+      3,
+      "move <id> <dx> <dy>",
+    );
+    const id = command.args[0];
+    if (id === undefined) {
+      throw new EditorError("usage: move <id> <dx> <dy>");
+    }
+
+    const dx = this.parseFiniteNumber(command.args[1], "dx");
+    const dy = this.parseFiniteNumber(command.args[2], "dy");
+    const result = this.editor.execute(
+      new MoveCommand(id, dx, dy),
+    );
+
+    return this.formatter.editResult(
+      result,
+      this.requireDocument(),
+      "execute",
+    );
+  }
+
+  private scaleShape(command: ParsedCommand): string {
+    this.requireDocument();
+    this.requireArgumentCount(
+      command,
+      2,
+      "scale <id> <factor>",
+    );
+    const id = command.args[0];
+    if (id === undefined) {
+      throw new EditorError("usage: scale <id> <factor>");
+    }
+
+    const factor = Number(command.args[1]);
+    if (!Number.isFinite(factor) || factor <= 0) {
+      throw new EditorError("scale factor must be positive");
+    }
+
+    const result = this.editor.execute(
+      new ScaleCommand(id, factor),
+    );
+
+    return this.formatter.editResult(
+      result,
+      this.requireDocument(),
+      "execute",
+    );
+  }
+
+  private setAttribute(command: ParsedCommand): string {
+    this.requireDocument();
+    this.requireArgumentCount(
+      command,
+      3,
+      "set <id> <attr> <value>",
+    );
+    const id = command.args[0];
+    const attribute = command.args[1];
+    const value = command.args[2];
+    if (
+      id === undefined ||
+      attribute === undefined ||
+      value === undefined
+    ) {
+      throw new EditorError("usage: set <id> <attr> <value>");
+    }
+
+    const result = this.editor.execute(
+      new SetCommand(id, attribute, value),
+    );
+
+    return this.formatter.editResult(
+      result,
+      this.requireDocument(),
+      "execute",
+    );
+  }
+
+  private showTree(command: ParsedCommand): string {
+    const document = this.requireDocument();
+    if (command.args.length > 1) {
+      throw new EditorError("usage: tree [id]");
+    }
+
+    return this.formatter.tree(document, command.args[0]);
+  }
+
+  private showShape(command: ParsedCommand): string {
+    const document = this.requireDocument();
+    this.requireArgumentCount(command, 1, "show <id>");
+    const id = command.args[0];
+    if (id === undefined) {
+      throw new EditorError("usage: show <id>");
+    }
+
+    return this.formatter.show(document, id);
+  }
+
+  private undo(command: ParsedCommand): string {
+    this.requireDocument();
+    this.requireNoArguments(command, "undo");
+    const result = this.editor.undo();
+    return this.formatter.editResult(
+      result,
+      this.requireDocument(),
+      "undo",
+    );
+  }
+
+  private redo(command: ParsedCommand): string {
+    this.requireDocument();
+    this.requireNoArguments(command, "redo");
+    const result = this.editor.redo();
+    return this.formatter.editResult(
+      result,
+      this.requireDocument(),
+      "redo",
+    );
+  }
+
+  private requireDocument(): CanvasDocument {
+    const document = this.editor.document;
+    if (document === undefined) {
+      throw new EditorError(
+        "no document. use 'init' or 'read' first",
+      );
+    }
+
+    return document;
+  }
+
+  private requireArgumentCount(
+    command: ParsedCommand,
+    count: number,
+    usage: string,
+  ): void {
+    if (command.args.length !== count) {
+      throw new EditorError(`usage: ${usage}`);
+    }
+  }
+
+  private requireNoArguments(
+    command: ParsedCommand,
+    usage: string,
+  ): void {
+    if (command.args.length !== 0) {
+      throw new EditorError(`usage: ${usage}`);
+    }
+  }
+
+  private parseFiniteNumber(
+    value: string | undefined,
+    attribute: string,
+  ): number {
+    const parsed = Number(value);
+    if (
+      value === undefined ||
+      value.trim().length === 0 ||
+      !Number.isFinite(parsed)
+    ) {
+      throw new EditorError(
+        `invalid value for attribute: ${attribute}`,
+      );
+    }
+
+    return parsed;
+  }
+
   private rejectUnavailableCommand(command: ParsedCommand): string {
     if (!KNOWN_COMMANDS.has(command.name)) {
       throw new EditorError(`unknown command: ${command.name}`);
     }
 
-    if (!this.editor.hasDocument) {
-      throw new EditorError(
-        "no document. use 'init' or 'read' first",
-      );
-    }
+    this.requireDocument();
 
     throw new EditorError(`command not implemented: ${command.name}`);
   }

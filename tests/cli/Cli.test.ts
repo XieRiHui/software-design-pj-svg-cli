@@ -22,7 +22,7 @@ describe("Cli", () => {
       [
         "svg-editor 0.1 — type 'help' for commands",
         "svg> canvas 12x34 created",
-        "svg> error: command not implemented: tree",
+        "svg> svg (12x34)",
         "svg> ",
       ].join("\n"),
     );

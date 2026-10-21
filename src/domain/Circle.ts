@@ -1,5 +1,9 @@
 import { PrimitiveShape } from "./PrimitiveShape.js";
-import { Shape } from "./Shape.js";
+import {
+  Shape,
+  type Point,
+  type ShapeAttribute,
+} from "./Shape.js";
 
 export class Circle extends PrimitiveShape {
   private cxValue: number;
@@ -65,6 +69,27 @@ export class Circle extends PrimitiveShape {
       this.stroke,
       this.strokeWidth,
     );
+  }
+
+  public override getPosition(): Point {
+    return { x: this.cxValue, y: this.cyValue };
+  }
+
+  public override getTreeSummary(): string {
+    return [
+      `cx=${this.cxValue}`,
+      `cy=${this.cyValue}`,
+      `r=${this.radiusValue}`,
+    ].join(" ") + this.styleSummary();
+  }
+
+  public override getShowAttributes(): readonly ShapeAttribute[] {
+    return [
+      { name: "cx", value: this.cxValue.toString() },
+      { name: "cy", value: this.cyValue.toString() },
+      { name: "r", value: this.radiusValue.toString() },
+      ...this.getCommonAttributes(),
+    ];
   }
 
   protected override setTypeAttribute(

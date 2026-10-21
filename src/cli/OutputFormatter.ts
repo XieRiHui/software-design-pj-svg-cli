@@ -1,3 +1,11 @@
+import {
+  type EditDirection,
+  type EditResult,
+} from "../application/EditResult.js";
+import { type CanvasDocument } from "../domain/CanvasDocument.js";
+import { type Shape } from "../domain/Shape.js";
+import { EditorError } from "../shared/EditorError.js";
+
 const HELP_TEXT = [
   "Document commands:",
   "  init [w] [h]",
@@ -36,7 +44,162 @@ export class OutputFormatter {
     return HELP_TEXT;
   }
 
+  public editResult(
+    result: EditResult,
+    document: CanvasDocument,
+    direction: EditDirection,
+  ): string {
+    switch (result.kind) {
+      case "create":
+        return this.formatCreateResult(result, direction);
+      case "delete":
+        return this.formatDeleteResult(result, direction);
+      case "move":
+        return this.formatMoveResult(result, document, direction);
+      case "scale":
+        return direction === "undo"
+          ? `${result.typeName}#${result.id} scale undone`
+          : `${result.typeName}#${result.id} scaled by ${result.factor}`;
+      case "set":
+        return this.formatSetResult(result, document);
+    }
+  }
+
+  public tree(document: CanvasDocument, rootId?: string): string {
+    if (rootId === undefined) {
+      const lines = [
+        `svg (${document.width}x${document.height})`,
+      ];
+      this.appendTree(lines, document.rootShapes, "");
+      return lines.join("\n");
+    }
+
+    const root = this.requireShape(document, rootId);
+    const lines = [this.formatTreeLine("", root)];
+    this.appendTree(lines, root.children, "");
+    return lines.join("\n");
+  }
+
+  public show(document: CanvasDocument, id: string): string {
+    const shape = this.requireShape(document, id);
+    const parent = document.getParent(id);
+    const parentLabel = parent === undefined
+      ? "svg"
+      : `${parent.typeName}#${parent.id}`;
+    const lines = [
+      `${shape.typeName}#${shape.id}  parent=${parentLabel}`,
+    ];
+
+    for (const attribute of shape.getShowAttributes()) {
+      lines.push(
+        `  ${attribute.name}=${this.formatAttributeValue(
+          attribute.name,
+          attribute.value,
+        )}`,
+      );
+    }
+
+    return lines.join("\n");
+  }
+
   public error(message: string): string {
     return `error: ${message}`;
+  }
+
+  private formatCreateResult(
+    result: Extract<EditResult, { kind: "create" }>,
+    direction: EditDirection,
+  ): string {
+    if (direction === "undo") {
+      return `${result.typeName}#${result.id} creation undone`;
+    }
+
+    const location = result.containerId === null
+      ? ""
+      : ` in g#${result.containerId}`;
+    return `${result.typeName}#${result.id} created${location}`;
+  }
+
+  private formatDeleteResult(
+    result: Extract<EditResult, { kind: "delete" }>,
+    direction: EditDirection,
+  ): string {
+    if (direction === "undo") {
+      return result.parentId === null
+        ? `${result.typeName}#${result.id} restored to svg`
+        : `${result.typeName}#${result.id} restored into g#${result.parentId}`;
+    }
+
+    return `${result.typeName}#${result.id} deleted`;
+  }
+
+  private formatMoveResult(
+    result: Extract<EditResult, { kind: "move" }>,
+    document: CanvasDocument,
+    direction: EditDirection,
+  ): string {
+    const shape = document.getShape(result.id);
+    const position = shape?.getPosition();
+    if (position !== undefined && position !== null) {
+      const verb = direction === "undo" ? "moved back to" : "moved to";
+      return `${result.typeName}#${result.id} ${verb} (${position.x},${position.y})`;
+    }
+
+    const dx = direction === "undo" ? -result.dx : result.dx;
+    const dy = direction === "undo" ? -result.dy : result.dy;
+    const verb = direction === "undo" ? "moved back by" : "moved by";
+    return `${result.typeName}#${result.id} ${verb} (${dx},${dy})`;
+  }
+
+  private formatSetResult(
+    result: Extract<EditResult, { kind: "set" }>,
+    document: CanvasDocument,
+  ): string {
+    const current = document.getShape(result.id)?.getAttribute(
+      result.attribute,
+    ) ?? result.value;
+    return `${result.typeName}#${result.id} updated: ${result.attribute}=${this.formatAttributeValue(result.attribute, current)}`;
+  }
+
+  private appendTree(
+    lines: string[],
+    shapes: readonly Shape[],
+    indent: string,
+  ): void {
+    shapes.forEach((shape, index) => {
+      const isLast = index === shapes.length - 1;
+      const branch = isLast ? "└── " : "├── ";
+      lines.push(this.formatTreeLine(`${indent}${branch}`, shape));
+      const childIndent = indent + (isLast ? "    " : "│   ");
+      this.appendTree(lines, shape.children, childIndent);
+    });
+  }
+
+  private formatTreeLine(prefix: string, shape: Shape): string {
+    const label = `${shape.typeName}#${shape.id}`;
+    const summary = shape.getTreeSummary();
+    if (summary.length === 0) {
+      return `${prefix}${label}`;
+    }
+
+    const lineStart = `${prefix}${label}`;
+    const padding = " ".repeat(Math.max(2, 19 - lineStart.length));
+    return `${lineStart}${padding}${summary}`;
+  }
+
+  private formatAttributeValue(name: string, value: string): string {
+    return name === "text" ? `"${value}"` : value;
+  }
+
+  private requireShape(
+    document: CanvasDocument,
+    id: string,
+  ): Shape {
+    const shape = document.getShape(id);
+    if (shape === undefined) {
+      throw new EditorError(`no such shape: ${id}`);
+    }
+
+    return shape;
   }
 }

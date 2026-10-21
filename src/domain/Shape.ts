@@ -1,5 +1,15 @@
 import { EditorError } from "../shared/EditorError.js";
 
+export interface Point {
+  readonly x: number;
+  readonly y: number;
+}
+
+export interface ShapeAttribute {
+  readonly name: string;
+  readonly value: string;
+}
+
 export abstract class Shape {
   private readonly shapeId: string;
   private fillValue: string | undefined;
@@ -42,11 +52,21 @@ export abstract class Shape {
 
   public abstract get typeName(): string;
 
+  public get children(): readonly Shape[] {
+    return [];
+  }
+
   public abstract move(dx: number, dy: number): void;
 
   public abstract scale(factor: number): void;
 
   public abstract clone(): Shape;
+
+  public abstract getPosition(): Point | null;
+
+  public abstract getTreeSummary(): string;
+
+  public abstract getShowAttributes(): readonly ShapeAttribute[];
 
   public setAttribute(attribute: string, value: string): void {
     if (attribute === "fill") {
@@ -95,6 +115,33 @@ export abstract class Shape {
 
   protected unknownAttribute(attribute: string): never {
     throw new EditorError(`unknown attribute: ${attribute}`);
+  }
+
+  protected getCommonAttributes(): readonly ShapeAttribute[] {
+    const attributes: ShapeAttribute[] = [];
+
+    if (this.fillValue !== undefined) {
+      attributes.push({ name: "fill", value: this.fillValue });
+    }
+
+    if (this.strokeValue !== undefined) {
+      attributes.push({ name: "stroke", value: this.strokeValue });
+    }
+
+    if (this.strokeWidthValue !== undefined) {
+      attributes.push({
+        name: "stroke-width",
+        value: this.strokeWidthValue.toString(),
+      });
+    }
+
+    return attributes;
+  }
+
+  protected styleSummary(): string {
+    return this.getCommonAttributes()
+      .map((attribute) => ` ${attribute.name}=${attribute.value}`)
+      .join("");
   }
 
   protected assertMove(dx: number, dy: number): void {

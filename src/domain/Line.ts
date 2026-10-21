@@ -1,5 +1,9 @@
 import { PrimitiveShape } from "./PrimitiveShape.js";
-import { Shape } from "./Shape.js";
+import {
+  Shape,
+  type Point,
+  type ShapeAttribute,
+} from "./Shape.js";
 
 export class Line extends PrimitiveShape {
   private x1Value: number;
@@ -79,6 +83,25 @@ export class Line extends PrimitiveShape {
       this.stroke,
       this.strokeWidth,
     );
+  }
+
+  public override getPosition(): Point {
+    return { x: this.x1Value, y: this.y1Value };
+  }
+
+  public override getTreeSummary(): string {
+    return `(${this.x1Value},${this.y1Value}) -> (${this.x2Value},${this.y2Value})` +
+      this.styleSummary();
+  }
+
+  public override getShowAttributes(): readonly ShapeAttribute[] {
+    return [
+      { name: "x1", value: this.x1Value.toString() },
+      { name: "y1", value: this.y1Value.toString() },
+      { name: "x2", value: this.x2Value.toString() },
+      { name: "y2", value: this.y2Value.toString() },
+      ...this.getCommonAttributes(),
+    ];
   }
 
   protected override setTypeAttribute(

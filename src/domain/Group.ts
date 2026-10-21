@@ -1,4 +1,8 @@
 import { CompositeShape } from "./CompositeShape.js";
+import {
+  type Point,
+  type ShapeAttribute,
+} from "./Shape.js";
 
 export class Group extends CompositeShape {
   public constructor(
@@ -27,5 +31,17 @@ export class Group extends CompositeShape {
     }
 
     return clone;
+  }
+
+  public override getPosition(): Point | null {
+    return null;
+  }
+
+  public override getTreeSummary(): string {
+    return this.styleSummary().trim();
+  }
+
+  public override getShowAttributes(): readonly ShapeAttribute[] {
+    return this.getCommonAttributes();
   }
 }
