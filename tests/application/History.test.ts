@@ -59,4 +59,15 @@ describe("History", () => {
 
     expect(() => history.takeUndo()).toThrow("nothing to undo");
   });
+
+  it("can disable history without discarding its stacks", () => {
+    const history = new History();
+    const document = new CanvasDocument(100, 100);
+    history.record({ before: document, after: document, result });
+    history.disable();
+
+    expect(() => history.takeUndo()).toThrow(
+      "undo not allowed after io command",
+    );
+  });
 });

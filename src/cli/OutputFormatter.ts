@@ -40,6 +40,21 @@ export class OutputFormatter {
     return `canvas ${width}x${height} created`;
   }
 
+  public readCompleted(
+    filePath: string,
+    elementCount: number,
+    warnings: readonly string[],
+  ): string {
+    return [
+      ...warnings,
+      `read ${filePath} (${elementCount} elements)`,
+    ].join("\n");
+  }
+
+  public savedTo(filePath: string, elementCount: number): string {
+    return `saved to ${filePath} (${elementCount} elements)`;
+  }
+
   public help(): string {
     return HELP_TEXT;
   }

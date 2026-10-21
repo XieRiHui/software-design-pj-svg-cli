@@ -47,6 +47,10 @@ export class History {
     this.enabled = false;
   }
 
+  public disable(): void {
+    this.enabled = false;
+  }
+
   private assertAvailable(): void {
     if (!this.enabled) {
       throw new EditorError("undo not allowed after io command");

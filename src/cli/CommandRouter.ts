@@ -10,6 +10,8 @@ import { ScaleCommand } from "../application/commands/ScaleCommand.js";
 import { SetCommand } from "../application/commands/SetCommand.js";
 import { UngroupCommand } from "../application/commands/UngroupCommand.js";
 import { type CanvasDocument } from "../domain/CanvasDocument.js";
+import { SvgReader } from "../infrastructure/SvgReader.js";
+import { SvgWriter } from "../infrastructure/SvgWriter.js";
 import { EditorError } from "../shared/EditorError.js";
 import { type ParsedCommand } from "./CommandParser.js";
 import { OutputFormatter } from "./OutputFormatter.js";
@@ -40,6 +42,8 @@ export class CommandRouter {
   public constructor(
     private readonly editor: Editor,
     private readonly formatter: OutputFormatter,
+    private readonly svgReader = new SvgReader(),
+    private readonly svgWriter = new SvgWriter(),
   ) {}
 
   public execute(command: ParsedCommand): string {
@@ -48,6 +52,10 @@ export class CommandRouter {
         return this.showHelp(command);
       case "init":
         return this.initializeDocument(command);
+      case "read":
+        return this.readDocument(command);
+      case "save":
+        return this.saveDocument(command);
       case "create":
         return this.createShape(command);
       case "delete":
@@ -119,6 +127,41 @@ export class CommandRouter {
     }
 
     return dimension;
+  }
+
+  private readDocument(command: ParsedCommand): string {
+    this.requireArgumentCount(command, 1, "read <file.svg>");
+    const filePath = command.args[0];
+    if (filePath === undefined) {
+      throw new EditorError("usage: read <file.svg>");
+    }
+
+    const result = this.svgReader.read(filePath);
+    this.editor.openDocument(result.document, filePath);
+    return this.formatter.readCompleted(
+      filePath,
+      result.document.elementCount,
+      result.warnings,
+    );
+  }
+
+  private saveDocument(command: ParsedCommand): string {
+    const document = this.requireDocument();
+    if (command.args.length > 1) {
+      throw new EditorError("usage: save [file.svg]");
+    }
+
+    const filePath = command.args[0] ?? this.editor.filePath;
+    if (filePath === undefined) {
+      throw new EditorError("no file path for save");
+    }
+
+    this.svgWriter.write(document, filePath);
+    this.editor.markSaved(filePath);
+    return this.formatter.savedTo(
+      filePath,
+      document.elementCount,
+    );
   }
 
   private createShape(command: ParsedCommand): string {

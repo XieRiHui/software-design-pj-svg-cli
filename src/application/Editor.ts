@@ -14,6 +14,7 @@ const DEFAULT_CANVAS_SIZE: CanvasSize = Object.freeze({
 
 export class Editor {
   private currentDocument: CanvasDocument | undefined;
+  private currentFilePath: string | undefined;
   private readonly history = new History();
 
   public initialize(
@@ -22,8 +23,24 @@ export class Editor {
   ): CanvasSize {
     const document = new CanvasDocument(width, height);
     this.currentDocument = document;
+    this.currentFilePath = undefined;
     this.history.reset();
     return document.canvasSize;
+  }
+
+  public openDocument(
+    document: CanvasDocument,
+    filePath: string,
+  ): void {
+    this.currentDocument = document;
+    this.currentFilePath = filePath;
+    this.history.reset();
+  }
+
+  public markSaved(filePath: string): void {
+    this.requireDocument();
+    this.currentFilePath = filePath;
+    this.history.disable();
   }
 
   public execute(command: EditCommand): EditResult {
@@ -65,6 +82,10 @@ export class Editor {
 
   public get document(): CanvasDocument | undefined {
     return this.currentDocument;
+  }
+
+  public get filePath(): string | undefined {
+    return this.currentFilePath;
   }
 
   private requireDocument(): CanvasDocument {
