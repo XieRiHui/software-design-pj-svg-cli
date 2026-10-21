@@ -257,6 +257,53 @@ describe("CommandExecutor", () => {
     );
   });
 
+  it("queries and resizes the canvas with IO history boundaries", () => {
+    const editor = new Editor();
+    const executor = new CommandExecutor(editor);
+    executor.execute("init 400 300");
+    executor.execute("create rect r1 0 0 10 10");
+
+    expect(executor.execute("canvas")).toBe("canvas 400x300");
+    expect(executor.execute("canvas 640 480")).toBe(
+      "canvas resized to 640x480",
+    );
+    expect(executor.execute("canvas")).toBe("canvas 640x480");
+    expect(executor.execute("undo")).toBe(
+      "error: undo not allowed after io command",
+    );
+
+    expect(executor.execute("move r1 5 0")).toBe(
+      "rect#r1 moved to (5,0)",
+    );
+    expect(executor.execute("undo")).toBe(
+      "rect#r1 moved back to (0,0)",
+    );
+    expect(executor.execute("undo")).toBe(
+      "error: nothing to undo",
+    );
+  });
+
+  it("keeps canvas and history unchanged when resize fails", () => {
+    const editor = new Editor();
+    const executor = new CommandExecutor(editor);
+    executor.execute("init 400 300");
+    executor.execute("create rect r1 0 0 10 10");
+
+    expect(executor.execute("canvas 0 200")).toBe(
+      "error: invalid canvas size",
+    );
+    expect(executor.execute("canvas nope 200")).toBe(
+      "error: invalid canvas size",
+    );
+    expect(executor.execute("canvas 200")).toBe(
+      "error: usage: canvas [w] [h]",
+    );
+    expect(executor.execute("canvas")).toBe("canvas 400x300");
+    expect(executor.execute("undo")).toBe(
+      "rect#r1 creation undone",
+    );
+  });
+
   it("enforces core argument and shape errors without mutation", () => {
     const editor = new Editor();
     const executor = new CommandExecutor(editor);

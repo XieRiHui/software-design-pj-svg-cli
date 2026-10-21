@@ -9,8 +9,8 @@ export interface CanvasSize {
 }
 
 export class CanvasDocument {
-  private readonly canvasWidth: number;
-  private readonly canvasHeight: number;
+  private canvasWidth: number;
+  private canvasHeight: number;
   private readonly rootChildren: Shape[] = [];
   private readonly shapesById = new Map<string, Shape>();
   private readonly parentsById = new Map<
@@ -37,6 +37,13 @@ export class CanvasDocument {
       width: this.canvasWidth,
       height: this.canvasHeight,
     });
+  }
+
+  public resize(width: number, height: number): CanvasSize {
+    this.assertCanvasSize(width, height);
+    this.canvasWidth = width;
+    this.canvasHeight = height;
+    return this.canvasSize;
   }
 
   public get rootShapes(): readonly Shape[] {

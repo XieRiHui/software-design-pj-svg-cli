@@ -105,6 +105,28 @@ describe("SvgReader", () => {
     ]);
   });
 
+  it("reads UTF-8 files containing a byte order mark", () => {
+    const filePath = join(directory, "bom.svg");
+    const source = [
+      '<?xml version="1.0" encoding="UTF-8"?>',
+      '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200">',
+      '  <rect id="r1" x="0" y="0" width="320" height="200"/>',
+      "</svg>",
+    ].join("\n");
+    const bom = Buffer.from([0xef, 0xbb, 0xbf]);
+    writeFileSync(
+      filePath,
+      Buffer.concat([bom, Buffer.from(source, "utf8")]),
+    );
+
+    const result = reader.read(filePath);
+
+    expect(result.document.width).toBe(320);
+    expect(result.document.height).toBe(200);
+    expect(result.document.getShape("r1")?.typeName).toBe("rect");
+    expect(result.warnings).toEqual([]);
+  });
+
   it("skips unsupported elements and degrades data-kind groups to g", () => {
     const source = [
       '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100">',
@@ -121,6 +143,22 @@ describe("SvgReader", () => {
     expect(result.document.getShape("box")).toBeInstanceOf(Group);
     expect(result.document.getParent("inside")?.id).toBe("box");
     expect(result.document.elementCount).toBe(2);
+  });
+
+  it("does not reserve ids from unsupported containers such as defs", () => {
+    const source = [
+      '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100">',
+      '  <defs><rect id="same" x="0" y="0" width="5" height="5"/></defs>',
+      '  <rect id="same" x="10" y="10" width="10" height="10"/>',
+      "</svg>",
+    ].join("\n");
+
+    const result = reader.parseContent(source);
+
+    expect(result.document.rootShapes.map((shape) => shape.id)).toEqual([
+      "same",
+    ]);
+    expect(result.document.elementCount).toBe(1);
   });
 
   it("rejects duplicate explicit ids when reading a file", () => {

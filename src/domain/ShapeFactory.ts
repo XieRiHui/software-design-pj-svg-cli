@@ -22,6 +22,15 @@ export class ShapeFactory {
     }
   }
 
+  public isContainer(type: string): boolean {
+    switch (type) {
+      case "g":
+        return true;
+      default:
+        return false;
+    }
+  }
+
   public create(
     type: string,
     id: string,

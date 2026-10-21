@@ -159,4 +159,23 @@ describe("CanvasDocument", () => {
       "invalid canvas size",
     );
   });
+
+  it("resizes only with valid dimensions", () => {
+    const document = new CanvasDocument(800, 600);
+
+    expect(document.resize(1024, 768)).toEqual({
+      width: 1024,
+      height: 768,
+    });
+    expect(document.width).toBe(1024);
+    expect(document.height).toBe(768);
+
+    expect(() => document.resize(0, 300)).toThrow(
+      "invalid canvas size",
+    );
+    expect(document.canvasSize).toEqual({
+      width: 1024,
+      height: 768,
+    });
+  });
 });

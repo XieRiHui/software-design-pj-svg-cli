@@ -42,6 +42,9 @@ export class SvgReader {
   }
 
   public parseContent(source: string): SvgReadResult {
+    const xmlSource = source.charCodeAt(0) === 0xfeff
+      ? source.slice(1)
+      : source;
     const parseErrors: string[] = [];
     const dom = new DOMParser({
       onError: (level, message) => {
@@ -49,7 +52,7 @@ export class SvgReader {
           parseErrors.push(message);
         }
       },
-    }).parseFromString(source, "image/svg+xml");
+    }).parseFromString(xmlSource, "image/svg+xml");
 
     if (parseErrors.length > 0) {
       throw new Error("invalid SVG XML");
@@ -121,8 +124,10 @@ export class SvgReader {
             }
             ids.add(id);
           }
+          if (this.shapeFactory.isContainer(type)) {
+            visit(child);
+          }
         }
-        visit(child);
       }
     };
 

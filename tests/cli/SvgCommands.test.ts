@@ -72,6 +72,31 @@ describe("SVG commands", () => {
     );
   });
 
+  it("reads a UTF-8 BOM file written by legacy Windows tools", () => {
+    const editor = new Editor();
+    const executor = new CommandExecutor(editor);
+    const filePath = join(directory, "bom.svg");
+    const source = [
+      '<?xml version="1.0" encoding="UTF-8"?>',
+      '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100">',
+      '  <rect id="r1" x="0" y="0" width="20" height="10"/>',
+      "</svg>",
+    ].join("\r\n");
+    writeFileSync(
+      filePath,
+      Buffer.concat([
+        Buffer.from([0xef, 0xbb, 0xbf]),
+        Buffer.from(source, "utf8"),
+      ]),
+    );
+
+    expect(executor.execute(`read "${filePath}"`)).toBe(
+      `read ${filePath} (1 elements)`,
+    );
+    expect(editor.document?.getShape("r1")).toBeDefined();
+    expect(executor.execute("tree")).toContain("rect#r1");
+  });
+
   it("saves to an explicit path and uses it for the next pathless save", () => {
     const editor = new Editor();
     const executor = new CommandExecutor(editor);
@@ -91,6 +116,21 @@ describe("SVG commands", () => {
     executor.execute(`save "${secondPath}"`);
     expect(editor.filePath).toBe(secondPath);
     expect(() => readFileSync(secondPath, "utf8")).not.toThrow();
+  });
+
+  it("persists resized canvas dimensions in saved SVG", () => {
+    const executor = new CommandExecutor();
+    const filePath = join(directory, "resized.svg");
+    executor.execute("init 200 100");
+    executor.execute("create rect r1 0 0 10 10");
+    executor.execute("canvas 320 180");
+
+    expect(executor.execute(`save "${filePath}"`)).toBe(
+      `saved to ${filePath} (1 elements)`,
+    );
+    const saved = new SvgReader().read(filePath).document;
+    expect(saved.width).toBe(320);
+    expect(saved.height).toBe(180);
   });
 
   it("disables history after read until the next edit", () => {

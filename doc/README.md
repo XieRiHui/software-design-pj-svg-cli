@@ -107,5 +107,32 @@ CLI ─────────────► Application ─────► Do
 |---|---|
 | 新增图形类型 | 通过 `ShapeFactory` 和图形多态扩展。阶段一不引入插件接口，`box` 继续作为未知类型处理。 |
 | 命令语法或命令集合变化 | 词法分析、命令分派和命令实现分别隔离，可在不修改领域模型的情况下扩展。 |
-| SVG 文件格式或解析库变化 | 具体文件处理集中在基础设施层，领域层只处理图形树和属性。 |
+| SVG 文件格式或解析库变化 | 具体文件处理集中在基础设施层，当前使用 `@xmldom/xmldom`；领域层只处理图形树和属性。 |
 | 撤销重做策略变化 | `Editor` 与 `History` 隔离历史管理，文档通过克隆能力提供稳定快照。 |
+
+## 过程记录
+
+1. 先建立 npm、严格 TypeScript、Vitest 和分层目录骨架，CLI 入口仅输出启动横幅。
+2. 随后接入逐行 REPL、词法分析、`help` 与 `init`，再实现六种图形的领域类、`ShapeFactory` 和 `CanvasDocument`。
+3. 应用层把编辑操作封装为独立 Command 对象，由 `Editor` 在成功前保存文档快照，实现单命令撤销单元、失败回滚和 redo 清理。
+4. `group`、`ungroup`、`addto`、`front`、`back` 在文档领域层完成原子结构校验，再通过快照事务接入 CLI。
+5. SVG I/O 使用基础设施层 DOM 解析器；保存时由领域属性生成标准 SVG。缺失 id 在导入时自动分配并输出警告。
+6. 用户测试反馈 PowerShell 5.1 和老版 Notepad 写出的 UTF-8 BOM 文件无法读取。排查确认为 `readFileSync(..., "utf8")` 保留了首字符 `U+FEFF`，解析器将其视为非法 XML 起始字符。修复统一放在 `SvgReader.parseContent` 入口，仅移除首个 BOM。
+7. 最终验收又发现 id 预扫描会进入 `defs` 等未导入子树，可能误报重复 id。扫描规则已调整为与导入树一致，只递归工厂声明支持的容器。
+8. 补齐 `canvas` 查询与修改尺寸。审计发现仅禁用旧历史时，下一次编辑解禁后继续 undo 可能通过旧快照间接回滚尺寸；最终改为尺寸修改成功后清空并禁用历史，下一次编辑从新尺寸重新建立历史。
+9. 使用独立 Headless Chrome 打开实际保存的文件并检查截图，确认 XML 声明、命名空间、尺寸与图形均可正常渲染。
+
+## 一致性自查
+
+1. **模块划分**：实际目录与方案一致。`domain` 保存图形与文档模型，`application` 保存命令和快照历史，`infrastructure` 保存 SVG 解析与文件读写，`cli` 负责输入、分派和结果格式化，`shared` 只包含 `EditorError`。
+2. **依赖方向**：领域层只依赖 `shared`；应用层只依赖 `domain`、`shared`；基础设施层只依赖 `domain`、`shared`；CLI 依赖应用层、基础设施层和共享模块。未发现反向依赖。
+3. **类边界**：具体图形类、抽象图形类和命令类均遵循一类一文件。
+4. **分派位置**：命令名分派集中在 `CommandRouter`，图形类型名分派集中在 `ShapeFactory`。
+5. **阶段边界**：命令表内的 `init`、`read`、`save`、`canvas`、`create`、`delete`、`move`、`scale`、`set`、`group`、`ungroup`、`addto`、`front`、`back`、`tree`、`show`、`help`、`undo`、`redo` 均已接入；`create box` 仍返回未知类型，没有引入插件系统。
+
+## 质量保证手段
+
+- 在全新依赖安装环境执行 `npm ci`，随后运行类型检查、Vitest 和 TypeScript 构建。
+- 单元测试覆盖图形多态、属性白名单、容器循环防护、文档 id 与顺序、快照历史、XML 解析、序列化和 BOM 处理。
+- 命令级集成测试覆盖典型会话、两节点流程图、全部命令的错误主路径、undo/redo 边界、读写失败原子性以及 SVG round-trip。
+- 通过 CLI 实际执行创建、保存、重新读取和显示流程，并使用独立 Headless Chrome 打开保存的 SVG，确认 XML 声明、命名空间、尺寸和图形都能正常渲染。

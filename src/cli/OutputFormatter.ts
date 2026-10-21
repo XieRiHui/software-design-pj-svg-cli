@@ -40,6 +40,14 @@ export class OutputFormatter {
     return `canvas ${width}x${height} created`;
   }
 
+  public canvasInfo(width: number, height: number): string {
+    return `canvas ${width}x${height}`;
+  }
+
+  public canvasResized(width: number, height: number): string {
+    return `canvas resized to ${width}x${height}`;
+  }
+
   public readCompleted(
     filePath: string,
     elementCount: number,

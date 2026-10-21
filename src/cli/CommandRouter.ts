@@ -16,28 +16,6 @@ import { EditorError } from "../shared/EditorError.js";
 import { type ParsedCommand } from "./CommandParser.js";
 import { OutputFormatter } from "./OutputFormatter.js";
 
-const KNOWN_COMMANDS = new Set([
-  "init",
-  "read",
-  "save",
-  "canvas",
-  "create",
-  "delete",
-  "move",
-  "scale",
-  "set",
-  "group",
-  "ungroup",
-  "addto",
-  "front",
-  "back",
-  "tree",
-  "show",
-  "help",
-  "undo",
-  "redo",
-]);
-
 export class CommandRouter {
   public constructor(
     private readonly editor: Editor,
@@ -56,6 +34,8 @@ export class CommandRouter {
         return this.readDocument(command);
       case "save":
         return this.saveDocument(command);
+      case "canvas":
+        return this.canvasDocument(command);
       case "create":
         return this.createShape(command);
       case "delete":
@@ -85,7 +65,7 @@ export class CommandRouter {
       case "redo":
         return this.redo(command);
       default:
-        return this.rejectUnavailableCommand(command);
+        return this.rejectUnknownCommand(command);
     }
   }
 
@@ -161,6 +141,28 @@ export class CommandRouter {
     return this.formatter.savedTo(
       filePath,
       document.elementCount,
+    );
+  }
+
+  private canvasDocument(command: ParsedCommand): string {
+    const document = this.requireDocument();
+    if (command.args.length === 0) {
+      return this.formatter.canvasInfo(
+        document.width,
+        document.height,
+      );
+    }
+
+    if (command.args.length !== 2) {
+      throw new EditorError("usage: canvas [w] [h]");
+    }
+
+    const width = this.parseDimension(command.args[0]);
+    const height = this.parseDimension(command.args[1]);
+    const canvasSize = this.editor.resizeCanvas(width, height);
+    return this.formatter.canvasResized(
+      canvasSize.width,
+      canvasSize.height,
     );
   }
 
@@ -475,13 +477,7 @@ export class CommandRouter {
     return parsed;
   }
 
-  private rejectUnavailableCommand(command: ParsedCommand): string {
-    if (!KNOWN_COMMANDS.has(command.name)) {
-      throw new EditorError(`unknown command: ${command.name}`);
-    }
-
-    this.requireDocument();
-
-    throw new EditorError(`command not implemented: ${command.name}`);
+  private rejectUnknownCommand(command: ParsedCommand): string {
+    throw new EditorError(`unknown command: ${command.name}`);
   }
 }

@@ -43,6 +43,13 @@ export class Editor {
     this.history.disable();
   }
 
+  public resizeCanvas(width: number, height: number): CanvasSize {
+    const document = this.requireDocument();
+    const canvasSize = document.resize(width, height);
+    this.history.reset();
+    return canvasSize;
+  }
+
   public execute(command: EditCommand): EditResult {
     const document = this.requireDocument();
     const before = document.clone();
