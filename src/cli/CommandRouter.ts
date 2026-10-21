@@ -1,9 +1,14 @@
 import { type Editor } from "../application/Editor.js";
+import { AddToCommand } from "../application/commands/AddToCommand.js";
+import { BackCommand } from "../application/commands/BackCommand.js";
 import { CreateCommand } from "../application/commands/CreateCommand.js";
 import { DeleteCommand } from "../application/commands/DeleteCommand.js";
+import { FrontCommand } from "../application/commands/FrontCommand.js";
+import { GroupCommand } from "../application/commands/GroupCommand.js";
 import { MoveCommand } from "../application/commands/MoveCommand.js";
 import { ScaleCommand } from "../application/commands/ScaleCommand.js";
 import { SetCommand } from "../application/commands/SetCommand.js";
+import { UngroupCommand } from "../application/commands/UngroupCommand.js";
 import { type CanvasDocument } from "../domain/CanvasDocument.js";
 import { EditorError } from "../shared/EditorError.js";
 import { type ParsedCommand } from "./CommandParser.js";
@@ -53,6 +58,16 @@ export class CommandRouter {
         return this.scaleShape(command);
       case "set":
         return this.setAttribute(command);
+      case "group":
+        return this.groupShapes(command);
+      case "ungroup":
+        return this.ungroupShape(command);
+      case "addto":
+        return this.addToGroup(command);
+      case "front":
+        return this.reorderShape(command, "front");
+      case "back":
+        return this.reorderShape(command, "back");
       case "tree":
         return this.showTree(command);
       case "show":
@@ -227,6 +242,98 @@ export class CommandRouter {
     const result = this.editor.execute(
       new SetCommand(id, attribute, value),
     );
+
+    return this.formatter.editResult(
+      result,
+      this.requireDocument(),
+      "execute",
+    );
+  }
+
+  private groupShapes(command: ParsedCommand): string {
+    this.requireDocument();
+    if (command.args.length < 2) {
+      throw new EditorError(
+        "usage: group <newGid> <id1> <id2>...",
+      );
+    }
+
+    const groupId = command.args[0];
+    if (groupId === undefined) {
+      throw new EditorError(
+        "usage: group <newGid> <id1> <id2>...",
+      );
+    }
+
+    const result = this.editor.execute(
+      new GroupCommand(groupId, command.args.slice(1)),
+    );
+
+    return this.formatter.editResult(
+      result,
+      this.requireDocument(),
+      "execute",
+    );
+  }
+
+  private ungroupShape(command: ParsedCommand): string {
+    this.requireDocument();
+    this.requireArgumentCount(command, 1, "ungroup <gid>");
+    const groupId = command.args[0];
+    if (groupId === undefined) {
+      throw new EditorError("usage: ungroup <gid>");
+    }
+
+    const result = this.editor.execute(
+      new UngroupCommand(groupId),
+    );
+
+    return this.formatter.editResult(
+      result,
+      this.requireDocument(),
+      "execute",
+    );
+  }
+
+  private addToGroup(command: ParsedCommand): string {
+    this.requireDocument();
+    this.requireArgumentCount(command, 2, "addto <gid> <id>");
+    const groupId = command.args[0];
+    const shapeId = command.args[1];
+    if (groupId === undefined || shapeId === undefined) {
+      throw new EditorError("usage: addto <gid> <id>");
+    }
+
+    const result = this.editor.execute(
+      new AddToCommand(groupId, shapeId),
+    );
+
+    return this.formatter.editResult(
+      result,
+      this.requireDocument(),
+      "execute",
+    );
+  }
+
+  private reorderShape(
+    command: ParsedCommand,
+    position: "front" | "back",
+  ): string {
+    this.requireDocument();
+    this.requireArgumentCount(
+      command,
+      1,
+      `${position} <id>`,
+    );
+    const shapeId = command.args[0];
+    if (shapeId === undefined) {
+      throw new EditorError(`usage: ${position} <id>`);
+    }
+
+    const editCommand = position === "front"
+      ? new FrontCommand(shapeId)
+      : new BackCommand(shapeId);
+    const result = this.editor.execute(editCommand);
 
     return this.formatter.editResult(
       result,

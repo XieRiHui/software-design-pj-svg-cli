@@ -4,6 +4,8 @@ import { Shape } from "./Shape.js";
 export abstract class CompositeShape extends Shape {
   private readonly childShapes: Shape[] = [];
 
+  public abstract get isUngroupable(): boolean;
+
   public override get children(): readonly Shape[] {
     return [...this.childShapes];
   }

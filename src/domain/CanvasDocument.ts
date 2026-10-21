@@ -1,5 +1,6 @@
 import { EditorError } from "../shared/EditorError.js";
 import { CompositeShape } from "./CompositeShape.js";
+import { Group } from "./Group.js";
 import { type Shape } from "./Shape.js";
 
 export interface CanvasSize {
@@ -109,6 +110,151 @@ export class CanvasDocument {
     }
   }
 
+  public groupShapes(
+    newId: string,
+    ids: readonly string[],
+  ): Group {
+    if (this.shapesById.has(newId)) {
+      throw new EditorError(`id already exists: ${newId}`);
+    }
+
+    if (ids.length === 0) {
+      throw new EditorError("group requires at least one shape");
+    }
+
+    const group = new Group(newId);
+    const selected: Shape[] = [];
+    for (const id of ids) {
+      const shape = this.requireShape(id);
+      if (selected.includes(shape)) {
+        throw new EditorError(`duplicate group target: ${id}`);
+      }
+      selected.push(shape);
+    }
+
+    this.assertNoSelectedDescendant(selected);
+
+    const locations = new Map<
+      Shape,
+      { readonly parent: CompositeShape | null; readonly index: number }
+    >();
+    for (const shape of selected) {
+      locations.set(shape, this.getLocation(shape));
+    }
+
+    const first = selected[0];
+    if (first === undefined) {
+      throw new EditorError("group requires at least one shape");
+    }
+
+    const firstLocation = locations.get(first);
+    if (firstLocation === undefined) {
+      throw new EditorError(`no such shape: ${first.id}`);
+    }
+
+    let insertionIndex = firstLocation.index;
+    for (const shape of selected.slice(1)) {
+      const location = locations.get(shape);
+      if (
+        location !== undefined &&
+        location.parent === firstLocation.parent &&
+        location.index < firstLocation.index
+      ) {
+        insertionIndex -= 1;
+      }
+    }
+
+    for (const shape of selected) {
+      this.detachShape(shape);
+    }
+
+    for (const shape of selected) {
+      group.appendChild(shape);
+    }
+
+    if (firstLocation.parent === null) {
+      this.rootChildren.splice(insertionIndex, 0, group);
+    } else {
+      firstLocation.parent.insertChild(insertionIndex, group);
+    }
+
+    this.shapesById.set(group.id, group);
+    this.parentsById.set(group.id, firstLocation.parent);
+    for (const shape of selected) {
+      this.parentsById.set(shape.id, group);
+    }
+
+    return group;
+  }
+
+  public ungroupGroup(id: string): readonly Shape[] {
+    const shape = this.requireShape(id);
+    if (!(shape instanceof CompositeShape)) {
+      throw new EditorError(`not a container: ${id}`);
+    }
+
+    if (!shape.isUngroupable) {
+      throw new EditorError(
+        `cannot ungroup composite shape: ${id}`,
+      );
+    }
+
+    const parent = this.parentsById.get(id);
+    if (parent === undefined || parent === null) {
+      throw new EditorError(
+        `cannot ungroup top-level container: ${id}`,
+      );
+    }
+
+    const index = parent.children.indexOf(shape);
+    if (index === -1) {
+      throw new EditorError(`no such shape: ${id}`);
+    }
+
+    const children = shape.children;
+    for (const child of children) {
+      shape.removeChild(child);
+    }
+    parent.removeChild(shape);
+
+    children.forEach((child, childIndex) => {
+      parent.insertChild(index + childIndex, child);
+      this.parentsById.set(child.id, parent);
+    });
+
+    this.shapesById.delete(id);
+    this.parentsById.delete(id);
+    return children;
+  }
+
+  public moveToFront(id: string): void {
+    const shape = this.requireShape(id);
+    const parent = this.parentsById.get(id) ?? null;
+
+    if (parent === null) {
+      this.removeRoot(shape);
+      this.rootChildren.push(shape);
+      return;
+    }
+
+    parent.removeChild(shape);
+    parent.appendChild(shape);
+  }
+
+  public moveToBack(id: string): void {
+    const shape = this.requireShape(id);
+    const parent = this.parentsById.get(id) ?? null;
+
+    if (parent === null) {
+      this.removeRoot(shape);
+      this.rootChildren.unshift(shape);
+      return;
+    }
+
+    parent.removeChild(shape);
+    parent.insertChild(0, shape);
+  }
+
   public removeShape(id: string): Shape {
     const shape = this.requireShape(id);
     const parent = this.parentsById.get(id) ?? null;
@@ -173,6 +319,49 @@ export class CanvasDocument {
     }
 
     return shapes;
+  }
+
+  private assertNoSelectedDescendant(
+    selected: readonly Shape[],
+  ): void {
+    for (const shape of selected) {
+      if (!(shape instanceof CompositeShape)) {
+        continue;
+      }
+
+      for (const other of selected) {
+        if (shape !== other && shape.contains(other)) {
+          throw new EditorError(
+            `cannot group a container into its own descendant: ${shape.id}`,
+          );
+        }
+      }
+    }
+  }
+
+  private getLocation(shape: Shape): {
+    readonly parent: CompositeShape | null;
+    readonly index: number;
+  } {
+    const parent = this.parentsById.get(shape.id) ?? null;
+    const siblings = parent === null
+      ? this.rootChildren
+      : parent.children;
+    const index = siblings.indexOf(shape);
+    if (index === -1) {
+      throw new EditorError(`no such shape: ${shape.id}`);
+    }
+
+    return { parent, index };
+  }
+
+  private detachShape(shape: Shape): void {
+    const parent = this.parentsById.get(shape.id) ?? null;
+    if (parent === null) {
+      this.removeRoot(shape);
+    } else {
+      parent.removeChild(shape);
+    }
   }
 
   private assertUniqueSubtreeIds(

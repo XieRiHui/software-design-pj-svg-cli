@@ -87,7 +87,7 @@ describe("Editor", () => {
       "10",
     );
     const redone = editor.redo();
-    expect(redone.typeName).toBe("rect");
+    expect(redone.kind).toBe("move");
   });
 
   it("clears redo after a new successful edit", () => {

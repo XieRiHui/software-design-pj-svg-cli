@@ -78,7 +78,7 @@ describe("CommandExecutor", () => {
       "g#scene created",
     );
     expect(executor.execute("group cluster scene")).toBe(
-      "error: command not implemented: group",
+      "g#cluster created with 1 child",
     );
     expect(executor.execute('set title text "unfinished')).toBe(
       "error: unterminated quoted argument",
@@ -278,6 +278,109 @@ describe("CommandExecutor", () => {
     expect(editor.document?.getShape("r2")).toBeUndefined();
     expect(editor.document?.getShape("r1")?.getAttribute("width")).toBe(
       "10",
+    );
+  });
+
+  it("groups shapes in order as one undo unit", () => {
+    const executor = new CommandExecutor();
+    executor.execute("init 400 300");
+    executor.execute("create rect a 0 0 10 10");
+    executor.execute("create rect b 10 0 10 10");
+    executor.execute("create rect c 20 0 10 10");
+
+    expect(executor.execute("group group c a")).toBe(
+      "g#group created with 2 children",
+    );
+    expect(executor.execute("tree")).toContain(
+      "└── g#group",
+    );
+    const subtree = executor.execute("tree group")?.split("\n") ?? [];
+    expect(subtree[0]).toBe("g#group");
+    expect(subtree).toHaveLength(3);
+    expect(subtree[1]).toContain("rect#c");
+    expect(subtree[2]).toContain("rect#a");
+
+    expect(executor.execute("undo")).toBe(
+      "g#group grouping undone",
+    );
+    expect(executor.execute("tree")).not.toContain("g#group");
+    expect(executor.execute("redo")).toBe(
+      "g#group created with 2 children",
+    );
+  });
+
+  it("rejects grouping a container with its descendant and preserves redo", () => {
+    const editor = new Editor();
+    const executor = new CommandExecutor(editor);
+    executor.execute("init 400 300");
+    executor.execute("create rect outside 0 0 10 10");
+    executor.execute("create g container");
+    executor.execute("create rect child 10 0 10 10 in container");
+    executor.execute("move child 5 0");
+    executor.execute("undo");
+
+    expect(executor.execute("group bad child container")).toBe(
+      "error: cannot group a container into its own descendant: container",
+    );
+    expect(executor.execute("show child")).toContain(
+      "rect#child  parent=g#container",
+    );
+    expect(executor.execute("redo")).toBe(
+      "rect#child moved to (15,0)",
+    );
+    expect(editor.document?.getShape("bad")).toBeUndefined();
+  });
+
+  it("ungroups nested containers and rejects top-level containers", () => {
+    const executor = new CommandExecutor();
+    executor.execute("init 400 300");
+    executor.execute("create g parent");
+    executor.execute("create g nested");
+    executor.execute("addto parent nested");
+    executor.execute("create rect a 0 0 10 10 in nested");
+    executor.execute("create rect b 10 0 10 10 in nested");
+
+    expect(executor.execute("ungroup nested")).toBe(
+      "g#nested ungrouped",
+    );
+    expect(executor.execute("show a")).toContain(
+      "rect#a  parent=g#parent",
+    );
+    expect(executor.execute("ungroup parent")).toBe(
+      "error: cannot ungroup top-level container: parent",
+    );
+    expect(executor.execute("undo")).toBe(
+      "g#nested restored with 2 children",
+    );
+  });
+
+  it("adds shapes last and moves them to front or back within siblings", () => {
+    const executor = new CommandExecutor();
+    executor.execute("init 400 300");
+    executor.execute("create g group");
+    executor.execute("create rect a 0 0 10 10");
+    executor.execute("create rect b 10 0 10 10");
+
+    expect(executor.execute("addto group a")).toBe(
+      "rect#a added to g#group",
+    );
+    expect(executor.execute("addto group b")).toBe(
+      "rect#b added to g#group",
+    );
+    expect(executor.execute("front a")).toBe(
+      "rect#a moved to front",
+    );
+    expect(executor.execute("tree group")).toContain(
+      "├── rect#b",
+    );
+    expect(executor.execute("back a")).toBe(
+      "rect#a moved to back",
+    );
+    expect(executor.execute("show a")).toContain(
+      "rect#a  parent=g#group",
+    );
+    expect(executor.execute("addto group group")).toBe(
+      "error: cannot group a container into its own descendant: group",
     );
   });
 });

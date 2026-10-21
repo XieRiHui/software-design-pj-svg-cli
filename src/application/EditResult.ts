@@ -37,9 +37,42 @@ export interface SetEditResult {
   readonly value: string;
 }
 
+export interface GroupEditResult {
+  readonly kind: "group";
+  readonly groupId: string;
+  readonly childIds: readonly string[];
+  readonly parentId: string | null;
+}
+
+export interface UngroupEditResult {
+  readonly kind: "ungroup";
+  readonly groupId: string;
+  readonly childIds: readonly string[];
+  readonly parentId: string | null;
+}
+
+export interface AddToEditResult {
+  readonly kind: "addto";
+  readonly typeName: string;
+  readonly id: string;
+  readonly groupId: string;
+  readonly previousParentId: string | null;
+}
+
+export interface ReorderEditResult {
+  readonly kind: "reorder";
+  readonly typeName: string;
+  readonly id: string;
+  readonly position: "front" | "back";
+}
+
 export type EditResult =
   | CreateEditResult
   | DeleteEditResult
   | MoveEditResult
   | ScaleEditResult
-  | SetEditResult;
+  | SetEditResult
+  | GroupEditResult
+  | UngroupEditResult
+  | AddToEditResult
+  | ReorderEditResult;

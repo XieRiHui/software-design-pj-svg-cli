@@ -18,6 +18,10 @@ export class Group extends CompositeShape {
     return "g";
   }
 
+  public override get isUngroupable(): boolean {
+    return true;
+  }
+
   public override clone(): Group {
     const clone = new Group(
       this.id,

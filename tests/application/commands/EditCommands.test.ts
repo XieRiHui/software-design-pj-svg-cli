@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest";
 
 import { CreateCommand } from "../../../src/application/commands/CreateCommand.js";
+import { AddToCommand } from "../../../src/application/commands/AddToCommand.js";
+import { BackCommand } from "../../../src/application/commands/BackCommand.js";
 import { DeleteCommand } from "../../../src/application/commands/DeleteCommand.js";
+import { FrontCommand } from "../../../src/application/commands/FrontCommand.js";
+import { GroupCommand } from "../../../src/application/commands/GroupCommand.js";
 import { MoveCommand } from "../../../src/application/commands/MoveCommand.js";
 import { ScaleCommand } from "../../../src/application/commands/ScaleCommand.js";
 import { SetCommand } from "../../../src/application/commands/SetCommand.js";
+import { UngroupCommand } from "../../../src/application/commands/UngroupCommand.js";
 import { CanvasDocument } from "../../../src/domain/CanvasDocument.js";
 import { Group } from "../../../src/domain/Group.js";
 import { Rect } from "../../../src/domain/Rect.js";
@@ -81,5 +86,64 @@ describe("edit commands", () => {
     expect(() =>
       new SetCommand("missing", "fill", "red").execute(document),
     ).toThrow("no such shape: missing");
+  });
+
+  it("groups and ungroups through separate command objects", () => {
+    const document = new CanvasDocument(400, 300);
+    document.addShape(new Rect("first", 0, 0, 10, 10));
+    document.addShape(new Rect("second", 10, 0, 10, 10));
+    document.addShape(new Group("parent"));
+    document.moveShape("first", "parent");
+    document.moveShape("second", "parent");
+
+    const grouped = new GroupCommand("nested", [
+      "second",
+      "first",
+    ]).execute(document);
+
+    expect(grouped).toEqual({
+      kind: "group",
+      groupId: "nested",
+      childIds: ["second", "first"],
+      parentId: "parent",
+    });
+    expect(document.getChildren("parent")[0]?.id).toBe("nested");
+
+    expect(new UngroupCommand("nested").execute(document)).toEqual({
+      kind: "ungroup",
+      groupId: "nested",
+      childIds: ["second", "first"],
+      parentId: "parent",
+    });
+    expect(document.getChildren("parent").map((shape) => shape.id)).toEqual([
+      "second",
+      "first",
+    ]);
+  });
+
+  it("moves shapes between groups and reorders siblings through commands", () => {
+    const document = new CanvasDocument(400, 300);
+    document.addShape(new Group("first"));
+    document.addShape(new Group("second"));
+    document.addShape(new Rect("rect", 0, 0, 10, 10));
+    document.addShape(new Rect("front", 10, 0, 10, 10));
+
+    expect(
+      new AddToCommand("first", "rect").execute(document),
+    ).toEqual({
+      kind: "addto",
+      typeName: "rect",
+      id: "rect",
+      groupId: "first",
+      previousParentId: null,
+    });
+    expect(new FrontCommand("rect").execute(document).kind).toBe(
+      "reorder",
+    );
+    expect(new BackCommand("rect").execute(document).kind).toBe(
+      "reorder",
+    );
+    expect(document.getParent("rect")?.id).toBe("first");
+    expect(document.getChildren("first")[0]?.id).toBe("rect");
   });
 });

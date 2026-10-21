@@ -62,6 +62,22 @@ export class OutputFormatter {
           : `${result.typeName}#${result.id} scaled by ${result.factor}`;
       case "set":
         return this.formatSetResult(result, document);
+      case "group":
+        return direction === "undo"
+          ? `g#${result.groupId} grouping undone`
+          : `g#${result.groupId} created with ${this.formatChildCount(result.childIds.length)}`;
+      case "ungroup":
+        return direction === "undo"
+          ? `g#${result.groupId} restored with ${this.formatChildCount(result.childIds.length)}`
+          : `g#${result.groupId} ungrouped`;
+      case "addto":
+        return direction === "undo"
+          ? `${result.typeName}#${result.id} moved back to ${result.previousParentId === null ? "svg" : `g#${result.previousParentId}`}`
+          : `${result.typeName}#${result.id} added to g#${result.groupId}`;
+      case "reorder":
+        return direction === "undo"
+          ? `${result.typeName}#${result.id} order restored`
+          : `${result.typeName}#${result.id} moved to ${result.position}`;
     }
   }
 
@@ -189,6 +205,10 @@ export class OutputFormatter {
 
   private formatAttributeValue(name: string, value: string): string {
     return name === "text" ? `"${value}"` : value;
+  }
+
+  private formatChildCount(count: number): string {
+    return `${count} ${count === 1 ? "child" : "children"}`;
   }
 
   private requireShape(
