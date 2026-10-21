@@ -1,0 +1,5 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+phase_cli_1.md
