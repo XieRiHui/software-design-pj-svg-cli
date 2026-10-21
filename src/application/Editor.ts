@@ -1,9 +1,7 @@
-import { EditorError } from "../shared/EditorError.js";
-
-export interface CanvasSize {
-  readonly width: number;
-  readonly height: number;
-}
+import {
+  CanvasDocument,
+  type CanvasSize,
+} from "../domain/CanvasDocument.js";
 
 const DEFAULT_CANVAS_SIZE: CanvasSize = Object.freeze({
   width: 800,
@@ -11,33 +9,26 @@ const DEFAULT_CANVAS_SIZE: CanvasSize = Object.freeze({
 });
 
 export class Editor {
-  private currentCanvas: CanvasSize | undefined;
+  private currentDocument: CanvasDocument | undefined;
 
   public initialize(
     width = DEFAULT_CANVAS_SIZE.width,
     height = DEFAULT_CANVAS_SIZE.height,
   ): CanvasSize {
-    this.assertValidSize(width, height);
-    this.currentCanvas = Object.freeze({ width, height });
-    return this.currentCanvas;
+    const document = new CanvasDocument(width, height);
+    this.currentDocument = document;
+    return document.canvasSize;
   }
 
   public get hasDocument(): boolean {
-    return this.currentCanvas !== undefined;
+    return this.currentDocument !== undefined;
   }
 
   public get canvasSize(): CanvasSize | undefined {
-    return this.currentCanvas;
+    return this.currentDocument?.canvasSize;
   }
 
-  private assertValidSize(width: number, height: number): void {
-    if (
-      !Number.isFinite(width) ||
-      !Number.isFinite(height) ||
-      width <= 0 ||
-      height <= 0
-    ) {
-      throw new EditorError("invalid canvas size");
-    }
+  public get document(): CanvasDocument | undefined {
+    return this.currentDocument;
   }
 }
