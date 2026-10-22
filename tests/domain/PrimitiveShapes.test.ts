@@ -82,6 +82,9 @@ describe("primitive shapes", () => {
     expect(line.getAttribute("x2")).toBe("40");
     expect(line.getAttribute("y2")).toBe("36");
     expect(line.getAttribute("stroke")).toBe("black");
+    expect(line.getTreeSummary()).toBe(
+      "(6,-4) -> (40,36)",
+    );
     expect(line.clone().getAttribute("x1")).toBe("6");
   });
 

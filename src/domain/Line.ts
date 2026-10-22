@@ -90,8 +90,7 @@ export class Line extends PrimitiveShape {
   }
 
   public override getTreeSummary(): string {
-    return `(${this.x1Value},${this.y1Value}) -> (${this.x2Value},${this.y2Value})` +
-      this.styleSummary();
+    return `(${this.x1Value},${this.y1Value}) -> (${this.x2Value},${this.y2Value})`;
   }
 
   public override getShowAttributes(): readonly ShapeAttribute[] {

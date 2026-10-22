@@ -85,6 +85,11 @@ describe("Phase 1 acceptance", () => {
       tree.indexOf("text#process-label"),
     );
     expect(tree).toContain("line#arrow1");
+    expect(tree).toContain("(280,130) -> (520,130)");
+    expect(tree).not.toContain("stroke=black");
+    expect(executor.execute("show arrow1")).toContain(
+      "stroke=black",
+    );
 
     expect(executor.execute("move node2 0 100")).toBe(
       "g#node2 moved by (0,100)",
