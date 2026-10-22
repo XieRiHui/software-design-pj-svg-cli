@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import { History } from "../../src/application/History.js";
 import { CanvasDocument } from "../../src/domain/CanvasDocument.js";
-import { EditorError } from "../../src/shared/EditorError.js";
 
 const result = {
   kind: "create",
@@ -37,16 +36,18 @@ describe("History", () => {
     expect(() => history.takeRedo()).toThrow("nothing to redo");
   });
 
-  it("disables undo and redo until reset is followed by an edit", () => {
+  it("clears history on reset and re-enables after the next edit", () => {
     const history = new History();
     const document = new CanvasDocument(100, 100);
     history.record({ before: document, after: document, result });
     history.reset();
 
-    expect(() => history.takeUndo()).toThrow(EditorError);
     expect(() => history.takeUndo()).toThrow(
-      "undo not allowed after io command",
+      "nothing to undo",
     );
+
+    history.record({ before: document, after: document, result });
+    expect(history.takeUndo().result).toBe(result);
   });
 
   it("reports an empty stack after history is enabled", () => {

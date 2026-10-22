@@ -143,6 +143,9 @@ describe("SvgReader", () => {
     expect(result.document.getShape("box")).toBeInstanceOf(Group);
     expect(result.document.getParent("inside")?.id).toBe("box");
     expect(result.document.elementCount).toBe(2);
+    expect(result.warnings).toEqual([
+      "warning: skipped unsupported element <path>",
+    ]);
   });
 
   it("does not reserve ids from unsupported containers such as defs", () => {
@@ -159,6 +162,9 @@ describe("SvgReader", () => {
       "same",
     ]);
     expect(result.document.elementCount).toBe(1);
+    expect(result.warnings).toEqual([
+      "warning: skipped unsupported element <defs>",
+    ]);
   });
 
   it("rejects duplicate explicit ids when reading a file", () => {

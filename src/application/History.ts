@@ -20,23 +20,23 @@ export class History {
   }
 
   public takeUndo(): HistoryEntry {
-    this.assertAvailable();
-    const entry = this.undoStack.pop();
-    if (entry === undefined) {
+    if (this.undoStack.length === 0) {
       throw new EditorError("nothing to undo");
     }
 
+    this.assertAvailable();
+    const entry = this.undoStack.pop() as HistoryEntry;
     this.redoStack.push(entry);
     return entry;
   }
 
   public takeRedo(): HistoryEntry {
-    this.assertAvailable();
-    const entry = this.redoStack.pop();
-    if (entry === undefined) {
+    if (this.redoStack.length === 0) {
       throw new EditorError("nothing to redo");
     }
 
+    this.assertAvailable();
+    const entry = this.redoStack.pop() as HistoryEntry;
     this.undoStack.push(entry);
     return entry;
   }

@@ -107,10 +107,10 @@ describe("CanvasDocument", () => {
     document.addShape(inner, "outer");
 
     expect(() => document.moveShape("outer", "outer")).toThrow(
-      "cannot group a container into its own descendant: outer",
+      "cannot move a container into its own descendant: outer",
     );
     expect(() => document.moveShape("outer", "inner")).toThrow(
-      "cannot group a container into its own descendant: outer",
+      "cannot move a container into its own descendant: outer",
     );
     expect(document.getParent("inner")).toBe(outer);
   });

@@ -147,7 +147,7 @@ describe("SVG commands", () => {
 
     executor.execute(`read "${filePath}"`);
     expect(executor.execute("undo")).toBe(
-      "error: undo not allowed after io command",
+      "error: nothing to undo",
     );
     expect(executor.execute("move r1 5 0")).toBe(
       "rect#r1 moved to (5,0)",

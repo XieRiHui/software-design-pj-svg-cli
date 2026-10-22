@@ -89,6 +89,9 @@ export class SvgReader {
     for (const element of this.childElements(source)) {
       const type = this.elementName(element);
       if (!this.shapeFactory.isSupported(type)) {
+        state.warnings.push(
+          `warning: skipped unsupported element <${type}>`,
+        );
         continue;
       }
 

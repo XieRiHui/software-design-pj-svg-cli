@@ -98,7 +98,7 @@ export class CanvasDocument {
       shape.contains(target)
     ) {
       throw new EditorError(
-        `cannot group a container into its own descendant: ${id}`,
+        `cannot move a container into its own descendant: ${id}`,
       );
     }
 

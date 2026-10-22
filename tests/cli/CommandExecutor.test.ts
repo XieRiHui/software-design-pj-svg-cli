@@ -250,10 +250,10 @@ describe("CommandExecutor", () => {
 
     executor.execute("init 200 100");
     expect(executor.execute("undo")).toBe(
-      "error: undo not allowed after io command",
+      "error: nothing to undo",
     );
     expect(executor.execute("redo")).toBe(
-      "error: undo not allowed after io command",
+      "error: nothing to redo",
     );
   });
 
@@ -269,7 +269,7 @@ describe("CommandExecutor", () => {
     );
     expect(executor.execute("canvas")).toBe("canvas 640x480");
     expect(executor.execute("undo")).toBe(
-      "error: undo not allowed after io command",
+      "error: nothing to undo",
     );
 
     expect(executor.execute("move r1 5 0")).toBe(
@@ -427,7 +427,7 @@ describe("CommandExecutor", () => {
       "rect#a  parent=g#group",
     );
     expect(executor.execute("addto group group")).toBe(
-      "error: cannot group a container into its own descendant: group",
+      "error: cannot move a container into its own descendant: group",
     );
   });
 });
