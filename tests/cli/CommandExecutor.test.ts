@@ -127,9 +127,7 @@ describe("CommandExecutor", () => {
     expect(executor.execute("show c1")).toBe(
       [
         "circle#c1  parent=g#node1",
-        "  cx=50",
-        "  cy=60",
-        "  r=10",
+        "  cx=50 cy=60 r=10",
         "  fill=red",
       ].join("\n"),
     );

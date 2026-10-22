@@ -3,7 +3,10 @@ import {
   type EditResult,
 } from "../application/EditResult.js";
 import { type CanvasDocument } from "../domain/CanvasDocument.js";
-import { type Shape } from "../domain/Shape.js";
+import {
+  type Shape,
+  type ShapeAttribute,
+} from "../domain/Shape.js";
 import { EditorError } from "../shared/EditorError.js";
 
 const HELP_TEXT = [
@@ -34,6 +37,12 @@ const HELP_TEXT = [
   "  undo",
   "  redo",
 ].join("\n");
+
+const STYLE_ATTRIBUTE_NAMES = new Set([
+  "fill",
+  "stroke",
+  "stroke-width",
+]);
 
 export class OutputFormatter {
   public canvasCreated(width: number, height: number): string {
@@ -129,13 +138,22 @@ export class OutputFormatter {
       `${shape.typeName}#${shape.id}  parent=${parentLabel}`,
     ];
 
-    for (const attribute of shape.getShowAttributes()) {
+    const attributes = shape.getShowAttributes();
+    const geometryAttributes = attributes.filter(
+      (attribute) => !STYLE_ATTRIBUTE_NAMES.has(attribute.name),
+    );
+    const styleAttributes = attributes.filter((attribute) =>
+      STYLE_ATTRIBUTE_NAMES.has(attribute.name),
+    );
+
+    if (geometryAttributes.length > 0) {
       lines.push(
-        `  ${attribute.name}=${this.formatAttributeValue(
-          attribute.name,
-          attribute.value,
-        )}`,
+        `  ${this.formatAttributes(geometryAttributes)}`,
       );
+    }
+
+    for (const attribute of styleAttributes) {
+      lines.push(`  ${this.formatAttribute(attribute)}`);
     }
 
     return lines.join("\n");
@@ -224,6 +242,19 @@ export class OutputFormatter {
     const lineStart = `${prefix}${label}`;
     const padding = " ".repeat(Math.max(2, 19 - lineStart.length));
     return `${lineStart}${padding}${summary}`;
+  }
+
+  private formatAttribute(attribute: ShapeAttribute): string {
+    return `${attribute.name}=${this.formatAttributeValue(
+      attribute.name,
+      attribute.value,
+    )}`;
+  }
+
+  private formatAttributes(attributes: readonly ShapeAttribute[]): string {
+    return attributes
+      .map((attribute) => this.formatAttribute(attribute))
+      .join(" ");
   }
 
   private formatAttributeValue(name: string, value: string): string {
