@@ -20,7 +20,6 @@ export class GroupCommand extends EditCommand {
       kind: "group",
       groupId: group.id,
       childIds: group.children.map((child) => child.id),
-      parentId: document.getParent(group.id)?.id ?? null,
     };
   }
 }

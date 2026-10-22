@@ -41,14 +41,12 @@ export interface GroupEditResult {
   readonly kind: "group";
   readonly groupId: string;
   readonly childIds: readonly string[];
-  readonly parentId: string | null;
 }
 
 export interface UngroupEditResult {
   readonly kind: "ungroup";
   readonly groupId: string;
   readonly childIds: readonly string[];
-  readonly parentId: string | null;
 }
 
 export interface AddToEditResult {

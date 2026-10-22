@@ -105,7 +105,6 @@ describe("edit commands", () => {
       kind: "group",
       groupId: "nested",
       childIds: ["second", "first"],
-      parentId: "parent",
     });
     expect(document.getChildren("parent")[0]?.id).toBe("nested");
 
@@ -113,7 +112,6 @@ describe("edit commands", () => {
       kind: "ungroup",
       groupId: "nested",
       childIds: ["second", "first"],
-      parentId: "parent",
     });
     expect(document.getChildren("parent").map((shape) => shape.id)).toEqual([
       "second",

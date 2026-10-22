@@ -1,11 +1,10 @@
-import { PrimitiveShape } from "./PrimitiveShape.js";
 import {
   Shape,
   type Point,
   type ShapeAttribute,
 } from "./Shape.js";
 
-export class Ellipse extends PrimitiveShape {
+export class Ellipse extends Shape {
   private cxValue: number;
   private cyValue: number;
   private radiusXValue: number;

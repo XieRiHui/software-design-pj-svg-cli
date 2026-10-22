@@ -1,11 +1,10 @@
-import { PrimitiveShape } from "./PrimitiveShape.js";
 import {
   Shape,
   type Point,
   type ShapeAttribute,
 } from "./Shape.js";
 
-export class Rect extends PrimitiveShape {
+export class Rect extends Shape {
   private xValue: number;
   private yValue: number;
   private widthValue: number;
