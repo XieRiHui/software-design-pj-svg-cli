@@ -161,7 +161,7 @@ describe("Editor", () => {
     editor.execute(new CreateCommand("g", "g2", [], null));
     editor.initialize(200, 100);
     expect(() => editor.undo()).toThrow(
-      "nothing to undo",
+      "undo not allowed after io command",
     );
   });
 });

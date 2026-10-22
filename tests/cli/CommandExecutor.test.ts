@@ -248,10 +248,10 @@ describe("CommandExecutor", () => {
 
     executor.execute("init 200 100");
     expect(executor.execute("undo")).toBe(
-      "error: nothing to undo",
+      "error: undo not allowed after io command",
     );
     expect(executor.execute("redo")).toBe(
-      "error: nothing to redo",
+      "error: undo not allowed after io command",
     );
   });
 
@@ -267,7 +267,7 @@ describe("CommandExecutor", () => {
     );
     expect(executor.execute("canvas")).toBe("canvas 640x480");
     expect(executor.execute("undo")).toBe(
-      "error: nothing to undo",
+      "error: undo not allowed after io command",
     );
 
     expect(executor.execute("move r1 5 0")).toBe(

@@ -43,7 +43,7 @@ describe("History", () => {
     history.reset();
 
     expect(() => history.takeUndo()).toThrow(
-      "nothing to undo",
+      "undo not allowed after io command",
     );
 
     history.record({ before: document, after: document, result });
