@@ -52,6 +52,10 @@ export abstract class Shape {
 
   public abstract get typeName(): string;
 
+  public get serializationName(): string {
+    return this.typeName;
+  }
+
   public get children(): readonly Shape[] {
     return [];
   }
@@ -67,6 +71,10 @@ export abstract class Shape {
   public abstract getTreeSummary(): string;
 
   public abstract getShowAttributes(): readonly ShapeAttribute[];
+
+  public getSerializationAttributes(): readonly ShapeAttribute[] {
+    return [];
+  }
 
   public setAttribute(attribute: string, value: string): void {
     if (attribute === "fill") {

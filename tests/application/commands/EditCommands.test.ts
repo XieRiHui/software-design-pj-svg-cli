@@ -14,6 +14,7 @@ import { CanvasDocument } from "../../../src/domain/CanvasDocument.js";
 import { Group } from "../../../src/domain/Group.js";
 import { Rect } from "../../../src/domain/Rect.js";
 import { EditorError } from "../../../src/shared/EditorError.js";
+import { TEST_SHAPES } from "../../helpers/TestPlugins.js";
 
 describe("edit commands", () => {
   it("creates a shape inside an existing container", () => {
@@ -25,6 +26,7 @@ describe("edit commands", () => {
       "r1",
       ["10", "20", "30", "40", "red"],
       "g1",
+      TEST_SHAPES,
     ).execute(document);
 
     expect(result).toEqual({

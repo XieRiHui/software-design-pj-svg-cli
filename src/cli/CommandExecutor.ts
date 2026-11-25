@@ -4,6 +4,7 @@ import { CommandLexer } from "./CommandLexer.js";
 import { CommandParser } from "./CommandParser.js";
 import { CommandRouter } from "./CommandRouter.js";
 import { OutputFormatter } from "./OutputFormatter.js";
+import { createPluginApplication } from "../bootstrap/ApplicationAssembler.js";
 
 export class CommandExecutor {
   private readonly lexer = new CommandLexer();
@@ -13,8 +14,12 @@ export class CommandExecutor {
   public constructor(
     editor = new Editor(),
     private readonly formatter = new OutputFormatter(),
+    router?: CommandRouter,
   ) {
-    this.router = new CommandRouter(editor, formatter);
+    this.router = router ?? createPluginApplication({
+      editor,
+      formatter,
+    }).router;
   }
 
   public execute(line: string): string | null {

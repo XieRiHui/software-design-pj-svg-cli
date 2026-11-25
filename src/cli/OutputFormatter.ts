@@ -2,41 +2,16 @@ import {
   type EditDirection,
   type EditResult,
 } from "../application/EditResult.js";
+import {
+  type Command,
+} from "../kernel/CommandContracts.js";
+import { type TreeDecorator } from "../kernel/PluginContracts.js";
 import { type CanvasDocument } from "../domain/CanvasDocument.js";
 import {
   type Shape,
   type ShapeAttribute,
 } from "../domain/Shape.js";
 import { EditorError } from "../shared/EditorError.js";
-
-const HELP_TEXT = [
-  "Document commands:",
-  "  init [w] [h]",
-  "  read <file.svg>",
-  "  save [file.svg]",
-  "  canvas [w] [h]",
-  "",
-  "Shape commands:",
-  "  create <type> <id> [params...] [in <containerId>]",
-  "  delete <id>",
-  "  move <id> <dx> <dy>",
-  "  scale <id> <factor>",
-  "  set <id> <attr> <value>",
-  "  group <newGid> <id1> <id2>...",
-  "  ungroup <gid>",
-  "  addto <gid> <id>",
-  "  front <id>",
-  "  back <id>",
-  "",
-  "Display commands:",
-  "  tree [id]",
-  "  show <id>",
-  "  help",
-  "",
-  "History commands:",
-  "  undo",
-  "  redo",
-].join("\n");
 
 const STYLE_ATTRIBUTE_NAMES = new Set([
   "fill",
@@ -72,8 +47,25 @@ export class OutputFormatter {
     return `saved to ${filePath} (${elementCount} elements)`;
   }
 
-  public help(): string {
-    return HELP_TEXT;
+  public help(commands: readonly Command[]): string {
+    const ordered = [...commands].sort(
+      (left, right) =>
+        left.help.sectionOrder - right.help.sectionOrder ||
+        left.help.order - right.help.order,
+    );
+    const groups = new Map<string, Command[]>();
+    for (const command of ordered) {
+      const group = groups.get(command.help.section) ?? [];
+      group.push(command);
+      groups.set(command.help.section, group);
+    }
+
+    return [...groups.entries()]
+      .map(([section, entries]) => [
+        `${section}:`,
+        ...entries.map((command) => `  ${command.help.line}`),
+      ].join("\n"))
+      .join("\n\n");
   }
 
   public editResult(
@@ -113,18 +105,59 @@ export class OutputFormatter {
     }
   }
 
-  public tree(document: CanvasDocument, rootId?: string): string {
+  public tree(
+    document: CanvasDocument,
+    decorators: readonly TreeDecorator[],
+    rootId?: string,
+    savedDocument?: CanvasDocument,
+    saveSequence = 0,
+  ): string {
     if (rootId === undefined) {
       const lines = [
-        `svg (${document.width}x${document.height})`,
+        this.appendDecorations(
+          `svg (${document.width}x${document.height})`,
+          decorators,
+          {
+            document,
+            shape: undefined,
+            isRoot: true,
+            savedDocument,
+            saveSequence,
+          },
+        ),
       ];
-      this.appendTree(lines, document.rootShapes, "");
+      this.appendTree(
+        lines,
+        document.rootShapes,
+        "",
+        decorators,
+        document,
+        savedDocument,
+        saveSequence,
+      );
       return lines.join("\n");
     }
 
     const root = this.requireShape(document, rootId);
-    const lines = [this.formatTreeLine("", root)];
-    this.appendTree(lines, root.children, "");
+    const lines = [
+      this.formatTreeLine(
+        "",
+        root,
+        decorators,
+        document,
+        savedDocument,
+        saveSequence,
+      ),
+    ];
+    this.appendTree(
+      lines,
+      root.children,
+      "",
+      decorators,
+      document,
+      savedDocument,
+      saveSequence,
+    );
     return lines.join("\n");
   }
 
@@ -222,19 +255,65 @@ export class OutputFormatter {
     lines: string[],
     shapes: readonly Shape[],
     indent: string,
+    decorators: readonly TreeDecorator[],
+    document: CanvasDocument,
+    savedDocument: CanvasDocument | undefined,
+    saveSequence: number,
   ): void {
     shapes.forEach((shape, index) => {
       const isLast = index === shapes.length - 1;
       const branch = isLast ? "└── " : "├── ";
-      lines.push(this.formatTreeLine(`${indent}${branch}`, shape));
+      lines.push(
+        this.formatTreeLine(
+          `${indent}${branch}`,
+          shape,
+          decorators,
+          document,
+          savedDocument,
+          saveSequence,
+        ),
+      );
       const childIndent = indent + (isLast ? "    " : "│   ");
-      this.appendTree(lines, shape.children, childIndent);
+      this.appendTree(
+        lines,
+        shape.children,
+        childIndent,
+        decorators,
+        document,
+        savedDocument,
+        saveSequence,
+      );
     });
   }
 
-  private formatTreeLine(prefix: string, shape: Shape): string {
+  private formatTreeLine(
+    prefix: string,
+    shape: Shape,
+    decorators: readonly TreeDecorator[],
+    document: CanvasDocument,
+    savedDocument: CanvasDocument | undefined,
+    saveSequence: number,
+  ): string {
     const label = `${shape.typeName}#${shape.id}`;
     const summary = shape.getTreeSummary();
+    const line = summary.length === 0
+      ? `${prefix}${label}`
+      : this.padTreeSummary(prefix, label, summary);
+
+    return this.appendDecorations(line, decorators, {
+      document,
+      shape,
+      isRoot: false,
+      savedDocument,
+      saveSequence,
+    });
+  }
+
+  private padTreeSummary(
+    prefix: string,
+    label: string,
+    summary: string,
+  ): string {
     if (summary.length === 0) {
       return `${prefix}${label}`;
     }
@@ -242,6 +321,22 @@ export class OutputFormatter {
     const lineStart = `${prefix}${label}`;
     const padding = " ".repeat(Math.max(2, 19 - lineStart.length));
     return `${lineStart}${padding}${summary}`;
+  }
+
+  private appendDecorations(
+    line: string,
+    decorators: readonly TreeDecorator[],
+    context: Parameters<TreeDecorator["decorate"]>[0],
+  ): string {
+    const labels = decorators.flatMap((decorator) =>
+      decorator.decorate(context)
+    );
+
+    if (labels.length === 0) {
+      return line;
+    }
+
+    return `${line}  ${labels.join(" ")}`;
   }
 
   private formatAttribute(attribute: ShapeAttribute): string {

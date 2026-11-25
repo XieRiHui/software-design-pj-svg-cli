@@ -7,6 +7,7 @@ import { ScaleCommand } from "../../src/application/commands/ScaleCommand.js";
 import { SetCommand } from "../../src/application/commands/SetCommand.js";
 import { CanvasDocument } from "../../src/domain/CanvasDocument.js";
 import { EditorError } from "../../src/shared/EditorError.js";
+import { TEST_SHAPES } from "../helpers/TestPlugins.js";
 
 describe("Editor", () => {
   it("starts without a document", () => {
@@ -47,6 +48,7 @@ describe("Editor", () => {
         "r1",
         ["10", "20", "30", "40"],
         null,
+        TEST_SHAPES,
       ),
     );
     editor.execute(new MoveCommand("r1", 5, 10));
@@ -66,7 +68,7 @@ describe("Editor", () => {
     const editor = new Editor();
     editor.initialize(400, 300);
     editor.execute(
-      new CreateCommand("g", "g1", [], null),
+      new CreateCommand("g", "g1", [], null, TEST_SHAPES),
     );
     editor.execute(
       new CreateCommand(
@@ -74,6 +76,7 @@ describe("Editor", () => {
         "r1",
         ["10", "20", "30", "40"],
         "g1",
+        TEST_SHAPES,
       ),
     );
     editor.execute(new MoveCommand("r1", 5, 0));
@@ -99,6 +102,7 @@ describe("Editor", () => {
         "r1",
         ["0", "0", "10", "10"],
         null,
+        TEST_SHAPES,
       ),
     );
     editor.execute(new MoveCommand("r1", 5, 0));
@@ -109,6 +113,7 @@ describe("Editor", () => {
         "c1",
         ["10", "10", "5"],
         null,
+        TEST_SHAPES,
       ),
     );
 
@@ -118,13 +123,16 @@ describe("Editor", () => {
   it("undoes a group scale as one command unit", () => {
     const editor = new Editor();
     editor.initialize(400, 300);
-    editor.execute(new CreateCommand("g", "g1", [], null));
+    editor.execute(
+      new CreateCommand("g", "g1", [], null, TEST_SHAPES),
+    );
     editor.execute(
       new CreateCommand(
         "rect",
         "r1",
         ["10", "20", "30", "40"],
         "g1",
+        TEST_SHAPES,
       ),
     );
     editor.execute(
@@ -133,6 +141,7 @@ describe("Editor", () => {
         "t1",
         ["5", "10", "Label"],
         "g1",
+        TEST_SHAPES,
       ),
     );
 
@@ -151,14 +160,16 @@ describe("Editor", () => {
     const editor = new Editor();
     editor.initialize(400, 300);
     editor.execute(
-      new CreateCommand("g", "g1", [], null),
+      new CreateCommand("g", "g1", [], null, TEST_SHAPES),
     );
 
     expect(() => editor.initialize(0, 300)).toThrow(EditorError);
     editor.undo();
     expect(editor.document?.getShape("g1")).toBeUndefined();
 
-    editor.execute(new CreateCommand("g", "g2", [], null));
+    editor.execute(
+      new CreateCommand("g", "g2", [], null, TEST_SHAPES),
+    );
     editor.initialize(200, 100);
     expect(() => editor.undo()).toThrow(
       "undo not allowed after io command",

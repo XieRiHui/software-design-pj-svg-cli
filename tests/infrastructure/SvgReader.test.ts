@@ -9,10 +9,10 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { Group } from "../../src/domain/Group.js";
-import { SvgReader } from "../../src/infrastructure/SvgReader.js";
+import { createTestSvgReader } from "../helpers/TestPlugins.js";
 
 describe("SvgReader", () => {
-  const reader = new SvgReader();
+  const reader = createTestSvgReader();
   let directory: string;
 
   beforeEach(() => {

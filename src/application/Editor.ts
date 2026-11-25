@@ -6,15 +6,18 @@ import { EditorError } from "../shared/EditorError.js";
 import { type EditCommand } from "./EditCommand.js";
 import { type EditResult } from "./EditResult.js";
 import { History } from "./History.js";
+import { type EditorPort } from "../kernel/CommandContracts.js";
 
 const DEFAULT_CANVAS_SIZE: CanvasSize = Object.freeze({
   width: 800,
   height: 600,
 });
 
-export class Editor {
+export class Editor implements EditorPort {
   private currentDocument: CanvasDocument | undefined;
   private currentFilePath: string | undefined;
+  private cleanDocument: CanvasDocument | undefined;
+  private currentSaveSequence = 0;
   private readonly history = new History();
 
   public initialize(
@@ -24,6 +27,8 @@ export class Editor {
     const document = new CanvasDocument(width, height);
     this.currentDocument = document;
     this.currentFilePath = undefined;
+    this.cleanDocument = undefined;
+    this.currentSaveSequence += 1;
     this.history.reset();
     return document.canvasSize;
   }
@@ -34,12 +39,16 @@ export class Editor {
   ): void {
     this.currentDocument = document;
     this.currentFilePath = filePath;
+    this.cleanDocument = document.clone();
+    this.currentSaveSequence += 1;
     this.history.reset();
   }
 
   public markSaved(filePath: string): void {
     this.requireDocument();
     this.currentFilePath = filePath;
+    this.cleanDocument = this.requireDocument().clone();
+    this.currentSaveSequence += 1;
     this.history.disable();
   }
 
@@ -93,6 +102,14 @@ export class Editor {
 
   public get filePath(): string | undefined {
     return this.currentFilePath;
+  }
+
+  public get savedDocument(): CanvasDocument | undefined {
+    return this.cleanDocument?.clone();
+  }
+
+  public get saveSequence(): number {
+    return this.currentSaveSequence;
   }
 
   private requireDocument(): CanvasDocument {

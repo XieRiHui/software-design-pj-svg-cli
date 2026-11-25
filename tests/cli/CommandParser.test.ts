@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import { CommandLexer } from "../../src/cli/CommandLexer.js";
 import { CommandParser } from "../../src/cli/CommandParser.js";
-import { EditorError } from "../../src/shared/EditorError.js";
 
 describe("CommandParser", () => {
   const lexer = new CommandLexer();
@@ -13,7 +12,7 @@ describe("CommandParser", () => {
     expect(parser.parse(lexer.tokenize("# comment"))).toBeNull();
   });
 
-  it("extracts the create in-container clause", () => {
+  it("returns tokens without interpreting plugin-specific syntax", () => {
     expect(
       parser.parse(
         lexer.tokenize(
@@ -22,8 +21,15 @@ describe("CommandParser", () => {
       ),
     ).toEqual({
       name: "create",
-      args: ["text", "title", "10", "20", "Hello world"],
-      containerId: "node1",
+      args: [
+        { value: "text", quoted: false },
+        { value: "title", quoted: false },
+        { value: "10", quoted: false },
+        { value: "20", quoted: false },
+        { value: "Hello world", quoted: true },
+        { value: "in", quoted: false },
+        { value: "node1", quoted: false },
+      ],
     });
   });
 
@@ -34,14 +40,20 @@ describe("CommandParser", () => {
       ),
     ).toEqual({
       name: "create",
-      args: ["text", "title", "10", "20", "in"],
-      containerId: null,
+      args: [
+        { value: "text", quoted: false },
+        { value: "title", quoted: false },
+        { value: "10", quoted: false },
+        { value: "20", quoted: false },
+        { value: "in", quoted: true },
+      ],
     });
   });
 
-  it("rejects an in clause without a container id", () => {
-    expect(() =>
-      parser.parse(lexer.tokenize("create rect box 0 0 10 10 in")),
-    ).toThrow(EditorError);
+  it("leaves an incomplete plugin clause for the command to validate", () => {
+    expect(
+      parser.parse(lexer.tokenize("create rect box 0 0 10 10 in"))?.args
+        .at(-1),
+    ).toEqual({ value: "in", quoted: false });
   });
 });

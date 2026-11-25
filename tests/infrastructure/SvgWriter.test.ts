@@ -9,8 +9,8 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { type CanvasDocument } from "../../src/domain/CanvasDocument.js";
 import { type Shape } from "../../src/domain/Shape.js";
-import { SvgReader } from "../../src/infrastructure/SvgReader.js";
 import { SvgWriter } from "../../src/infrastructure/SvgWriter.js";
+import { createTestSvgReader } from "../helpers/TestPlugins.js";
 
 interface ShapeSnapshot {
   readonly type: string;
@@ -23,7 +23,7 @@ interface ShapeSnapshot {
 }
 
 describe("SvgWriter", () => {
-  const reader = new SvgReader();
+  const reader = createTestSvgReader();
   const writer = new SvgWriter();
   let directory: string;
 

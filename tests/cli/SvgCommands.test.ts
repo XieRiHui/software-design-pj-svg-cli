@@ -11,7 +11,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { Editor } from "../../src/application/Editor.js";
 import { CommandExecutor } from "../../src/cli/CommandExecutor.js";
-import { SvgReader } from "../../src/infrastructure/SvgReader.js";
+import { createTestSvgReader } from "../helpers/TestPlugins.js";
 
 describe("SVG commands", () => {
   let directory: string;
@@ -57,7 +57,7 @@ describe("SVG commands", () => {
       `saved to ${filePath} (3 elements)`,
     );
     expect(
-      new SvgReader().read(filePath).document
+      createTestSvgReader().read(filePath).document
         .getShape("c1")
         ?.getAttribute("cx"),
     ).toBe("30");
@@ -128,7 +128,7 @@ describe("SVG commands", () => {
     expect(executor.execute(`save "${filePath}"`)).toBe(
       `saved to ${filePath} (1 elements)`,
     );
-    const saved = new SvgReader().read(filePath).document;
+    const saved = createTestSvgReader().read(filePath).document;
     expect(saved.width).toBe(320);
     expect(saved.height).toBe(180);
   });

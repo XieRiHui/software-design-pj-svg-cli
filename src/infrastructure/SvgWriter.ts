@@ -30,7 +30,10 @@ export class SvgWriter {
 
   private serializeShape(shape: Shape, depth: number): readonly string[] {
     const indent = "  ".repeat(depth);
-    const attributes = shape.getShowAttributes();
+    const attributes = [
+      ...shape.getShowAttributes(),
+      ...shape.getSerializationAttributes(),
+    ];
     const textAttribute = attributes.find(
       (attribute) => attribute.name === "text",
     );
@@ -44,20 +47,21 @@ export class SvgWriter {
           `${attribute.name}="${this.escapeAttribute(attribute.value)}"`,
       ),
     ].join(" ");
-    const opening = `${indent}<${shape.typeName} ${attributeText}`;
+    const opening =
+      `${indent}<${shape.serializationName} ${attributeText}`;
 
     if (shape.children.length > 0) {
       const lines = [`${opening}>`];
       for (const child of shape.children) {
         lines.push(...this.serializeShape(child, depth + 1));
       }
-      lines.push(`${indent}</${shape.typeName}>`);
+      lines.push(`${indent}</${shape.serializationName}>`);
       return lines;
     }
 
     if (textAttribute !== undefined) {
       return [
-        `${opening}>${this.escapeText(textAttribute.value)}</${shape.typeName}>`,
+        `${opening}>${this.escapeText(textAttribute.value)}</${shape.serializationName}>`,
       ];
     }
 

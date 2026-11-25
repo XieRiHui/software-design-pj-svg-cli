@@ -25,6 +25,7 @@ export abstract class CompositeShape extends Shape {
   }
 
   public removeChild(shape: Shape): boolean {
+    this.assertCanRemoveChild(shape);
     const index = this.childShapes.indexOf(shape);
     if (index === -1) {
       return false;
@@ -82,5 +83,9 @@ export abstract class CompositeShape extends Shape {
         `cannot group a container into its own descendant: ${shape.id}`,
       );
     }
+  }
+
+  protected assertCanRemoveChild(_shape: Shape): void {
+    // Containers are mutable unless a plugin defines a structural invariant.
   }
 }

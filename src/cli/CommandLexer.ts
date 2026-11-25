@@ -1,9 +1,7 @@
 import { EditorError } from "../shared/EditorError.js";
+import { type CommandToken } from "../kernel/CommandContracts.js";
 
-export interface CommandToken {
-  readonly value: string;
-  readonly quoted: boolean;
-}
+export type { CommandToken } from "../kernel/CommandContracts.js";
 
 export class CommandLexer {
   public tokenize(line: string): readonly CommandToken[] {

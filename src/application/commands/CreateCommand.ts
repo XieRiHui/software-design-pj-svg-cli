@@ -1,7 +1,8 @@
 import { EditCommand } from "../EditCommand.js";
 import { type EditResult } from "../EditResult.js";
 import { type CanvasDocument } from "../../domain/CanvasDocument.js";
-import { ShapeFactory } from "../../domain/ShapeFactory.js";
+import { type ShapeProviderCatalog } from "../../kernel/CommandContracts.js";
+import { EditorError } from "../../shared/EditorError.js";
 
 export class CreateCommand extends EditCommand {
   public constructor(
@@ -9,17 +10,20 @@ export class CreateCommand extends EditCommand {
     private readonly shapeId: string,
     private readonly parameters: readonly string[],
     private readonly containerId: string | null,
-    private readonly factory = new ShapeFactory(),
+    private readonly shapes: ShapeProviderCatalog,
   ) {
     super();
   }
 
   public override execute(document: CanvasDocument): EditResult {
-    const shape = this.factory.create(
-      this.shapeType,
-      this.shapeId,
-      this.parameters,
-    );
+    const provider = this.shapes.getForCreate(this.shapeType);
+    if (provider === undefined) {
+      throw new EditorError(
+        `unknown shape type: ${this.shapeType} (is the plugin loaded?)`,
+      );
+    }
+
+    const shape = provider.create(this.shapeId, this.parameters);
 
     document.addShape(
       shape,

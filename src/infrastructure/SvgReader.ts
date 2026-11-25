@@ -9,13 +9,13 @@ import {
   CanvasDocument,
 } from "../domain/CanvasDocument.js";
 import { CompositeShape } from "../domain/CompositeShape.js";
-import { ShapeFactory } from "../domain/ShapeFactory.js";
+import {
+  type ShapeProviderCatalog,
+  type SvgReadResult,
+} from "../kernel/CommandContracts.js";
 import { EditorError } from "../shared/EditorError.js";
 
-export interface SvgReadResult {
-  readonly document: CanvasDocument;
-  readonly warnings: readonly string[];
-}
+export type { SvgReadResult } from "../kernel/CommandContracts.js";
 
 interface IdAssignmentState {
   readonly usedIds: Set<string>;
@@ -24,7 +24,9 @@ interface IdAssignmentState {
 }
 
 export class SvgReader {
-  private readonly shapeFactory = new ShapeFactory();
+  public constructor(
+    private readonly shapeProviders: ShapeProviderCatalog,
+  ) {}
 
   public read(filePath: string): SvgReadResult {
     let source: string;
@@ -88,29 +90,30 @@ export class SvgReader {
   ): void {
     for (const element of this.childElements(source)) {
       const type = this.elementName(element);
-      if (!this.shapeFactory.isSupported(type)) {
+      const attributes = this.attributesOf(element);
+      const provider = this.shapeProviders.getForRestore(
+        type,
+        attributes,
+      );
+      if (provider === undefined) {
         state.warnings.push(
           `warning: skipped unsupported element <${type}>`,
         );
         continue;
       }
 
-      const attributes = this.attributesOf(element);
       const id = this.resolveId(type, attributes, state);
-      const shape = this.shapeFactory.createFromAttributes(
-        type,
+      const shape = provider.restore(
         id,
         attributes,
         element.textContent ?? "",
       );
-      if (shape === null) {
-        continue;
-      }
 
       document.addShape(shape, parent?.id);
       if (shape instanceof CompositeShape) {
         this.appendChildren(element, document, shape, state);
       }
+      provider.finalizeRestored?.(shape);
     }
   }
 
@@ -119,7 +122,12 @@ export class SvgReader {
     const visit = (element: Element): void => {
       for (const child of this.childElements(element)) {
         const type = this.elementName(child);
-        if (this.shapeFactory.isSupported(type)) {
+        const attributes = this.attributesOf(child);
+        const provider = this.shapeProviders.getForRestore(
+          type,
+          attributes,
+        );
+        if (provider !== undefined) {
           const id = this.elementId(child);
           if (id !== undefined) {
             if (ids.has(id)) {
@@ -127,9 +135,7 @@ export class SvgReader {
             }
             ids.add(id);
           }
-          if (this.shapeFactory.isContainer(type)) {
-            visit(child);
-          }
+          visit(child);
         }
       }
     };

@@ -1,19 +1,50 @@
 import { EditCommand } from "../EditCommand.js";
 import { type EditResult } from "../EditResult.js";
 import { type CanvasDocument } from "../../domain/CanvasDocument.js";
+import { type AttributeHandlerCatalog } from "../../kernel/CommandContracts.js";
+import { EditorError } from "../../shared/EditorError.js";
+
+const NO_ATTRIBUTE_HANDLERS: AttributeHandlerCatalog = {
+  findApplicable: () => [],
+  all: () => [],
+};
 
 export class SetCommand extends EditCommand {
   public constructor(
     private readonly shapeId: string,
     private readonly attribute: string,
     private readonly value: string,
+    private readonly handlers: AttributeHandlerCatalog =
+      NO_ATTRIBUTE_HANDLERS,
   ) {
     super();
   }
 
   public override execute(document: CanvasDocument): EditResult {
     const shape = this.requireShape(document, this.shapeId);
-    shape.setAttribute(this.attribute, this.value);
+    const handlers = this.handlers.findApplicable(
+      shape,
+      this.attribute,
+    );
+
+    if (handlers.length > 1) {
+      const names = handlers.map((handler) => handler.name).join(", ");
+      throw new EditorError(
+        `conflicting attribute handlers for ${shape.id}/${this.attribute}: ${names}`,
+      );
+    }
+
+    const handler = handlers[0];
+    if (handler === undefined) {
+      shape.setAttribute(this.attribute, this.value);
+    } else {
+      handler.apply({
+        document,
+        shape,
+        attribute: this.attribute,
+        value: this.value,
+      });
+    }
 
     return {
       kind: "set",
