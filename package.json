@@ -15,6 +15,8 @@
     "cli:config": "tsx src/cli/main.ts --config plugins.config.json",
     "build": "tsc -p tsconfig.build.json && node scripts/copy-plugin-manifests.mjs",
     "metrics": "node scripts/generate-metrics.mjs",
+    "transcripts": "node scripts/verify-transcripts.mjs",
+    "compare:final": "node scripts/compare-final.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"

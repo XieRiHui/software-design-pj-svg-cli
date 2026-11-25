@@ -1,0 +1,14 @@
+# Phase 2 box 会话：同时覆盖属性扩展、树标签、stats 和 undo/redo
+init 800 600
+create g flowchart
+create box n1 120 100 160 60 "开始" in flowchart
+create box n2 520 100 160 60 "处理数据" in flowchart
+create line arrow1 280 130 520 130 black in flowchart
+set n1 fill #f5a623
+set n2 fill #f5a623
+set n2 label "处理数据 v2"
+tree
+stats
+undo
+redo
+tree

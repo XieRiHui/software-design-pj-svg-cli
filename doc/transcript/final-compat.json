@@ -1,0 +1,7 @@
+{
+  "baseRef": "final",
+  "currentMode": "--builtins-only",
+  "input": "doc/transcript/cli-1.txt",
+  "equal": true,
+  "bytes": 792
+}

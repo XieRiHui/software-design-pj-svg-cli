@@ -1,0 +1,9 @@
+# Phase 2 命令会话：dir 在 init 前运行，固定工作目录内容见 transcript-cwd
+dir
+stats
+init 400 300
+create g group
+create rect r1 10 20 30 40 in group
+create circle c1 100 100 10 red
+stats
+help
