@@ -1,0 +1,10 @@
+{
+  "name": "options-fixture",
+  "private": true,
+  "type": "module",
+  "contributes": {
+    "commands": [
+      "option-value"
+    ]
+  }
+}

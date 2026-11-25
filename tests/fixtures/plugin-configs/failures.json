@@ -13,6 +13,9 @@
       "module": "./plugins/throws/index.ts"
     },
     {
+      "module": "./plugins/evaluation-throws/index.ts"
+    },
+    {
       "module": "./not-there.js"
     }
   ]

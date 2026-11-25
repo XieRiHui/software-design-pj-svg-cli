@@ -1,0 +1,10 @@
+{
+  "plugins": [
+    {
+      "module": "./plugins/options/index.ts",
+      "options": {
+        "reply": "option received"
+      }
+    }
+  ]
+}

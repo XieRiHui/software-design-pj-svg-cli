@@ -22,6 +22,7 @@ import {
 } from "../../src/kernel/CommandContracts.js";
 import { commandDirPlugin } from "../../src/plugins/command-dir/index.js";
 import { commandStatsPlugin } from "../../src/plugins/command-stats/index.js";
+import { shapeBoxPlugin } from "../../src/plugins/shape-box/index.js";
 
 describe("stats command plugin", () => {
   it("counts leaves depth-first and containers without mutating history", () => {
@@ -44,6 +45,21 @@ describe("stats command plugin", () => {
     expect(executor.execute("undo")).toBe("rect#r1 creation undone");
     expect(executor.execute("stats")).toBe(
       "circle: 1  text: 1  line: 1  (total 3, containers 2)",
+    );
+  });
+
+  it("counts leaves inside box containers", () => {
+    const executor = createExecutor(createPluginApplication({
+      plugins: [commandStatsPlugin, shapeBoxPlugin],
+    }));
+    executor.execute("init");
+    executor.execute('create box parent 0 0 200 100 "Parent"');
+    executor.execute(
+      'create box child 20 10 80 40 "Child" in parent',
+    );
+
+    expect(executor.execute("stats")).toBe(
+      "rect: 2  text: 2  (total 4, containers 2)",
     );
   });
 
@@ -132,6 +148,31 @@ describe("dir command plugin", () => {
       "error: cannot read directory: folder",
     );
     expect(executor.execute("undo")).toBe("rect#r1 creation undone");
+  });
+
+  it("keeps the process working directory after read and save", () => {
+    const directory = mkdtempSync(join(tmpdir(), "svg-cli-cwd-"));
+    temporaryDirectories.push(directory);
+    const inputPath = join(directory, "input.svg");
+    const outputPath = join(directory, "output.svg");
+    writeFileSync(
+      inputPath,
+      '<svg width="100" height="100"><rect id="r1" x="0" y="0" width="10" height="10"/></svg>',
+      "utf8",
+    );
+    const reader = new FakeDirectoryReader({ entries: [] });
+    const application = createPluginApplication({
+      plugins: [commandDirPlugin],
+      directories: reader,
+      workingDirectory: "fixed-process-directory",
+    });
+    const executor = createExecutor(application);
+
+    executor.execute(`read "${inputPath}"`);
+    executor.execute(`save "${outputPath}"`);
+
+    expect(executor.execute("dir")).toBe("(empty directory)");
+    expect(reader.paths).toEqual(["fixed-process-directory"]);
   });
 
   it("works through the real filesystem adapter", () => {

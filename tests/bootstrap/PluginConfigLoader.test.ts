@@ -40,6 +40,8 @@ describe("plugin config loader", () => {
         "registered: shapes=[]; commands=[actual]; " +
         "decorators=[]; attributes=[])",
       "error: plugin failed to activate: throws-fixture (synthetic failure)",
+      "error: plugin failed to activate: evaluation-fixture " +
+        "(module evaluation failed)",
       "error: plugin not found: ./not-there.js",
     ]);
     expect(executor.execute("help")).toContain("stats");
@@ -87,6 +89,16 @@ describe("plugin config loader", () => {
       "@svgframe/plugin-builtin-shapes",
       "@svgframe/plugin-builtin-commands",
     ]);
+  });
+
+  it("passes config options to the activation context", async () => {
+    const application = await createConfiguredApplication(
+      join(fixtureDirectory, "options.json"),
+    );
+    const executor = createExecutor(application);
+
+    expect(application.startupMessages).toEqual([]);
+    expect(executor.execute("option-value")).toBe("option received");
   });
 });
 
