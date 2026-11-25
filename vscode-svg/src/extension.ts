@@ -2,9 +2,11 @@ import * as vscode from "vscode";
 
 import { SvgDocumentSymbolProvider } from "./SvgDocumentSymbolProvider.js";
 import { SvgFileDecorationProvider } from "./SvgFileDecorationProvider.js";
+import { SvgOutlineHighlighter } from "./SvgOutlineHighlighter.js";
 
 export function activate(context: vscode.ExtensionContext): void {
   const decorationProvider = new SvgFileDecorationProvider();
+  const outlineHighlighter = new SvgOutlineHighlighter();
   const symbols = vscode.languages.registerDocumentSymbolProvider(
     { language: "svg", scheme: "file" },
     new SvgDocumentSymbolProvider(),
@@ -30,6 +32,7 @@ export function activate(context: vscode.ExtensionContext): void {
     watcher.onDidDelete(() => {
       refresh.appendLine("SVG decoration refreshed");
     }),
+    outlineHighlighter,
   );
 }
 

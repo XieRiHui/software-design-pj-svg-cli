@@ -48,6 +48,24 @@ export function parseSvgOutline(source: string): readonly SvgOutlineNode[] {
   }
 }
 
+export function findOutlineNodeAtPosition(
+  nodes: readonly SvgOutlineNode[],
+  position: SourcePosition,
+): SvgOutlineNode | undefined {
+  for (const node of nodes) {
+    if (positionsEqual(node.selectionRange.start, position)) {
+      return node;
+    }
+
+    const child = findOutlineNodeAtPosition(node.children, position);
+    if (child !== undefined) {
+      return child;
+    }
+  }
+
+  return undefined;
+}
+
 function parseSvgRoots(source: string): readonly MutableOutlineNode[] {
   const roots: MutableOutlineNode[] = [];
   const stack: MutableOutlineNode[] = [];
@@ -309,4 +327,11 @@ function isNameCharacter(character: string | undefined): boolean {
 
 function isTagName(value: string): boolean {
   return /^[A-Za-z_][A-Za-z0-9:_.-]*$/.test(value);
+}
+
+function positionsEqual(
+  left: SourcePosition,
+  right: SourcePosition,
+): boolean {
+  return left.line === right.line && left.character === right.character;
 }

@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { parseSvgOutline } from "../src/svgOutlineParser.js";
+import {
+  findOutlineNodeAtPosition,
+  parseSvgOutline,
+} from "../src/svgOutlineParser.js";
 
 describe("parseSvgOutline", () => {
   it("builds nested svg, container, and leaf symbols", () => {
@@ -91,5 +94,29 @@ describe("parseSvgOutline", () => {
       tagName: "circle",
       id: "c1",
     });
+  });
+
+  it("finds the exact outline node reached by native symbol navigation", () => {
+    const nodes = parseSvgOutline([
+      "<svg>",
+      '  <g id="group">',
+      '    <rect id="start" width="10" height="10"/>',
+      "  </g>",
+      "</svg>",
+    ].join("\n"));
+
+    expect(
+      findOutlineNodeAtPosition(nodes, { line: 2, character: 5 }),
+    ).toMatchObject({
+      tagName: "rect",
+      id: "start",
+      range: {
+        start: { line: 2, character: 4 },
+        end: { line: 2, character: 45 },
+      },
+    });
+    expect(
+      findOutlineNodeAtPosition(nodes, { line: 2, character: 4 }),
+    ).toBeUndefined();
   });
 });

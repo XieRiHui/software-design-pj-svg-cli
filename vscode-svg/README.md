@@ -4,7 +4,8 @@
 界面中补充两类导航信息：
 
 - Explorer 中为 `.svg` 文件显示 `[]` 徽标。
-- SVG 文本编辑器的原生 Outline 中显示元素嵌套层级，点击节点可定位到开始标签。
+- SVG 文本编辑器的原生 Outline 中显示元素嵌套层级。点击节点会定位到对应
+  元素，并将完整源码范围显示为蓝色高亮。
 
 ## 安装与启动
 
@@ -16,7 +17,7 @@ npm run compile
 ```
 
 在 VSCode 中打开本目录，按 `F5` 启动 Extension Development Host。随后打开
-`samples/outline-demo.svg`，在 Explorer 中查看 `[]` 标记，并打开 Outline
+`samples/demo.svg`，在 Explorer 中查看 `[]` 标记，并打开 Outline
 视图查看 `svg > g#flowchart > rect#start` 等层级。也可执行：
 
 ```bash
@@ -34,6 +35,9 @@ code --install-extension vscode-svg-navigator-0.1.0.vsix
   完整 SVG 规范校验，也不提供图形预览。
 - Outline 在文档内容变化后由 VSCode 重新调用 provider，因此无需额外缓存或
   手工刷新。
+- 点击 Outline 节点时，VSCode 执行原生符号导航；扩展识别该导航事件、匹配
+  对应元素，并用蓝色背景和边框装饰完整元素源码范围。点击源码或编辑文档后
+  高亮自动清除。
 
 ## 与模式的关系
 

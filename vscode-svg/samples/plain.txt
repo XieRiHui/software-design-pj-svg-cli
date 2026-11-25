@@ -1,1 +1,1 @@
-This ordinary text file is used to verify that the SVG badge is selective.
+Today is Sunny.
