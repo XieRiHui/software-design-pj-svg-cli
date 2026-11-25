@@ -33,7 +33,7 @@
   },
   "scripts": {
     "compile": "tsc -p tsconfig.json",
-    "test": "vitest run",
+    "test": "vitest run --config vitest.config.ts",
     "package": "npm run compile && npx @vscode/vsce package --no-dependencies"
   },
   "devDependencies": {

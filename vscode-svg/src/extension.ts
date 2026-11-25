@@ -24,14 +24,18 @@ export function activate(context: vscode.ExtensionContext): void {
     watcher,
     refresh,
     watcher.onDidCreate(() => {
+      decorationProvider.refresh();
       refresh.appendLine("SVG decoration refreshed");
     }),
     watcher.onDidChange(() => {
+      decorationProvider.refresh();
       refresh.appendLine("SVG decoration refreshed");
     }),
     watcher.onDidDelete(() => {
+      decorationProvider.refresh();
       refresh.appendLine("SVG decoration refreshed");
     }),
+    decorationProvider,
     outlineHighlighter,
   );
 }
