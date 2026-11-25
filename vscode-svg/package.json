@@ -1,0 +1,45 @@
+{
+  "name": "vscode-svg-navigator",
+  "displayName": "SVG Navigator",
+  "description": "SVG Explorer badges and native Outline support.",
+  "version": "0.1.0",
+  "publisher": "svg-editor-lab",
+  "private": true,
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:svg",
+    "workspaceContains:**/*.svg"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "svg",
+        "aliases": [
+          "SVG",
+          "svg"
+        ],
+        "extensions": [
+          ".svg"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "package": "npm run compile && npx @vscode/vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/vscode": "^1.96.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
