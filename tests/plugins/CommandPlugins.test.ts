@@ -190,6 +190,11 @@ describe("command plugin dual assembly", () => {
       "stats",
       "dir",
       "tree",
+      'create box n1 120 100 160 60 "开始"',
+      "set n1 fill #f5a623",
+      'set n1 label "处理数据 v2"',
+      "tree",
+      "stats",
     ];
 
     expect(executeLines(createExecutor(configApplication), lines)).toEqual(

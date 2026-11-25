@@ -5,6 +5,9 @@
     },
     {
       "module": "./dist/plugins/command-dir/index.js"
+    },
+    {
+      "module": "./dist/plugins/shape-box/index.js"
     }
   ]
 }

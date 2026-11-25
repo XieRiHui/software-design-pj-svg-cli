@@ -5,6 +5,9 @@
     },
     {
       "module": "../../../src/plugins/command-dir/index.ts"
+    },
+    {
+      "module": "../../../src/plugins/shape-box/index.ts"
     }
   ]
 }
