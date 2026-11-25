@@ -1,0 +1,932 @@
+{
+  "baseRef": "final",
+  "targetRef": "HEAD",
+  "targetLabel": "framework",
+  "categories": [
+    "kernel",
+    "assembly",
+    "plugin"
+  ],
+  "base": {
+    "categories": {
+      "kernel": {
+        "files": 25,
+        "lines": 2214,
+        "complexity": 232
+      },
+      "assembly": {
+        "files": 9,
+        "lines": 1273,
+        "complexity": 175
+      },
+      "plugin": {
+        "files": 0,
+        "lines": 0,
+        "complexity": 0
+      }
+    },
+    "total": {
+      "files": 34,
+      "lines": 3487,
+      "complexity": 407
+    },
+    "files": [
+      {
+        "path": "src/application/commands/AddToCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 26,
+        "complexity": 3
+      },
+      {
+        "path": "src/application/commands/BackCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 21,
+        "complexity": 1
+      },
+      {
+        "path": "src/application/commands/CreateCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 36,
+        "complexity": 3
+      },
+      {
+        "path": "src/application/commands/DeleteCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 22,
+        "complexity": 3
+      },
+      {
+        "path": "src/application/commands/FrontCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 21,
+        "complexity": 1
+      },
+      {
+        "path": "src/application/commands/GroupCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 25,
+        "complexity": 1
+      },
+      {
+        "path": "src/application/commands/MoveCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 26,
+        "complexity": 1
+      },
+      {
+        "path": "src/application/commands/ScaleCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 24,
+        "complexity": 1
+      },
+      {
+        "path": "src/application/commands/SetCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 26,
+        "complexity": 1
+      },
+      {
+        "path": "src/application/commands/UngroupCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 20,
+        "complexity": 1
+      },
+      {
+        "path": "src/application/EditCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 20,
+        "complexity": 2
+      },
+      {
+        "path": "src/application/Editor.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 107,
+        "complexity": 3
+      },
+      {
+        "path": "src/application/EditResult.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 76,
+        "complexity": 1
+      },
+      {
+        "path": "src/application/History.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 59,
+        "complexity": 4
+      },
+      {
+        "path": "src/cli/Cli.ts",
+        "category": "assembly",
+        "responsibility": "Command parsing, dispatch, output, and process entry",
+        "lines": 53,
+        "complexity": 12
+      },
+      {
+        "path": "src/cli/CommandExecutor.ts",
+        "category": "assembly",
+        "responsibility": "Command parsing, dispatch, output, and process entry",
+        "lines": 37,
+        "complexity": 4
+      },
+      {
+        "path": "src/cli/CommandLexer.ts",
+        "category": "assembly",
+        "responsibility": "Command parsing, dispatch, output, and process entry",
+        "lines": 78,
+        "complexity": 14
+      },
+      {
+        "path": "src/cli/CommandParser.ts",
+        "category": "assembly",
+        "responsibility": "Command parsing, dispatch, output, and process entry",
+        "lines": 47,
+        "complexity": 8
+      },
+      {
+        "path": "src/cli/CommandRouter.ts",
+        "category": "assembly",
+        "responsibility": "Command parsing, dispatch, output, and process entry",
+        "lines": 483,
+        "complexity": 58
+      },
+      {
+        "path": "src/cli/main.ts",
+        "category": "assembly",
+        "responsibility": "Command parsing, dispatch, output, and process entry",
+        "lines": 5,
+        "complexity": 1
+      },
+      {
+        "path": "src/cli/OutputFormatter.ts",
+        "category": "assembly",
+        "responsibility": "Command parsing, dispatch, output, and process entry",
+        "lines": 279,
+        "complexity": 37
+      },
+      {
+        "path": "src/domain/CanvasDocument.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 436,
+        "complexity": 76
+      },
+      {
+        "path": "src/domain/Circle.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 127,
+        "complexity": 10
+      },
+      {
+        "path": "src/domain/CompositeShape.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 86,
+        "complexity": 13
+      },
+      {
+        "path": "src/domain/Ellipse.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 144,
+        "complexity": 12
+      },
+      {
+        "path": "src/domain/Group.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 51,
+        "complexity": 5
+      },
+      {
+        "path": "src/domain/Line.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 143,
+        "complexity": 12
+      },
+      {
+        "path": "src/domain/Rect.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 144,
+        "complexity": 12
+      },
+      {
+        "path": "src/domain/Shape.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 242,
+        "complexity": 26
+      },
+      {
+        "path": "src/domain/ShapeFactory.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 204,
+        "complexity": 29
+      },
+      {
+        "path": "src/domain/Text.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 122,
+        "complexity": 10
+      },
+      {
+        "path": "src/infrastructure/SvgReader.ts",
+        "category": "assembly",
+        "responsibility": "SVG and filesystem adapters",
+        "lines": 210,
+        "complexity": 35
+      },
+      {
+        "path": "src/infrastructure/SvgWriter.ts",
+        "category": "assembly",
+        "responsibility": "SVG and filesystem adapters",
+        "lines": 81,
+        "complexity": 6
+      },
+      {
+        "path": "src/shared/EditorError.ts",
+        "category": "kernel",
+        "responsibility": "Shared error type",
+        "lines": 6,
+        "complexity": 1
+      }
+    ]
+  },
+  "target": {
+    "categories": {
+      "kernel": {
+        "files": 29,
+        "lines": 2436,
+        "complexity": 226
+      },
+      "assembly": {
+        "files": 13,
+        "lines": 1378,
+        "complexity": 191
+      },
+      "plugin": {
+        "files": 3,
+        "lines": 782,
+        "complexity": 43
+      }
+    },
+    "total": {
+      "files": 45,
+      "lines": 4596,
+      "complexity": 460
+    },
+    "files": [
+      {
+        "path": "src/application/commands/AddToCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 26,
+        "complexity": 3
+      },
+      {
+        "path": "src/application/commands/BackCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 21,
+        "complexity": 1
+      },
+      {
+        "path": "src/application/commands/CreateCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 40,
+        "complexity": 4
+      },
+      {
+        "path": "src/application/commands/DeleteCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 22,
+        "complexity": 3
+      },
+      {
+        "path": "src/application/commands/FrontCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 21,
+        "complexity": 1
+      },
+      {
+        "path": "src/application/commands/GroupCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 25,
+        "complexity": 1
+      },
+      {
+        "path": "src/application/commands/MoveCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 26,
+        "complexity": 1
+      },
+      {
+        "path": "src/application/commands/ScaleCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 24,
+        "complexity": 1
+      },
+      {
+        "path": "src/application/commands/SetCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 57,
+        "complexity": 3
+      },
+      {
+        "path": "src/application/commands/UngroupCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 20,
+        "complexity": 1
+      },
+      {
+        "path": "src/application/EditCommand.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 1,
+        "complexity": 1
+      },
+      {
+        "path": "src/application/Editor.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 124,
+        "complexity": 3
+      },
+      {
+        "path": "src/application/EditResult.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 13,
+        "complexity": 1
+      },
+      {
+        "path": "src/application/History.ts",
+        "category": "kernel",
+        "responsibility": "Editing operations, snapshots, and undo/redo",
+        "lines": 59,
+        "complexity": 4
+      },
+      {
+        "path": "src/bootstrap/ApplicationAssembler.ts",
+        "category": "assembly",
+        "responsibility": "Plugin activation, validation, and composition root",
+        "lines": 154,
+        "complexity": 38
+      },
+      {
+        "path": "src/bootstrap/PluginHost.ts",
+        "category": "assembly",
+        "responsibility": "Plugin activation, validation, and composition root",
+        "lines": 273,
+        "complexity": 27
+      },
+      {
+        "path": "src/cli/Cli.ts",
+        "category": "assembly",
+        "responsibility": "Command parsing, dispatch, output, and process entry",
+        "lines": 53,
+        "complexity": 12
+      },
+      {
+        "path": "src/cli/CommandExecutor.ts",
+        "category": "assembly",
+        "responsibility": "Command parsing, dispatch, output, and process entry",
+        "lines": 42,
+        "complexity": 7
+      },
+      {
+        "path": "src/cli/CommandLexer.ts",
+        "category": "assembly",
+        "responsibility": "Command parsing, dispatch, output, and process entry",
+        "lines": 76,
+        "complexity": 14
+      },
+      {
+        "path": "src/cli/CommandParser.ts",
+        "category": "assembly",
+        "responsibility": "Command parsing, dispatch, output, and process entry",
+        "lines": 20,
+        "complexity": 2
+      },
+      {
+        "path": "src/cli/CommandRouter.ts",
+        "category": "assembly",
+        "responsibility": "Command parsing, dispatch, output, and process entry",
+        "lines": 22,
+        "complexity": 2
+      },
+      {
+        "path": "src/cli/main.ts",
+        "category": "assembly",
+        "responsibility": "Command parsing, dispatch, output, and process entry",
+        "lines": 5,
+        "complexity": 1
+      },
+      {
+        "path": "src/cli/OutputFormatter.ts",
+        "category": "assembly",
+        "responsibility": "Command parsing, dispatch, output, and process entry",
+        "lines": 374,
+        "complexity": 44
+      },
+      {
+        "path": "src/domain/CanvasDocument.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 436,
+        "complexity": 76
+      },
+      {
+        "path": "src/domain/Circle.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 127,
+        "complexity": 10
+      },
+      {
+        "path": "src/domain/CompositeShape.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 91,
+        "complexity": 13
+      },
+      {
+        "path": "src/domain/Ellipse.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 144,
+        "complexity": 12
+      },
+      {
+        "path": "src/domain/Group.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 51,
+        "complexity": 5
+      },
+      {
+        "path": "src/domain/Line.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 143,
+        "complexity": 12
+      },
+      {
+        "path": "src/domain/Rect.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 144,
+        "complexity": 12
+      },
+      {
+        "path": "src/domain/Shape.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 250,
+        "complexity": 26
+      },
+      {
+        "path": "src/domain/Text.ts",
+        "category": "kernel",
+        "responsibility": "Shape model and document invariants",
+        "lines": 122,
+        "complexity": 10
+      },
+      {
+        "path": "src/infrastructure/NodeDirectoryReader.ts",
+        "category": "assembly",
+        "responsibility": "SVG and filesystem adapters",
+        "lines": 36,
+        "complexity": 4
+      },
+      {
+        "path": "src/infrastructure/SvgIoAdapter.ts",
+        "category": "assembly",
+        "responsibility": "SVG and filesystem adapters",
+        "lines": 22,
+        "complexity": 1
+      },
+      {
+        "path": "src/infrastructure/SvgReader.ts",
+        "category": "assembly",
+        "responsibility": "SVG and filesystem adapters",
+        "lines": 216,
+        "complexity": 33
+      },
+      {
+        "path": "src/infrastructure/SvgWriter.ts",
+        "category": "assembly",
+        "responsibility": "SVG and filesystem adapters",
+        "lines": 85,
+        "complexity": 6
+      },
+      {
+        "path": "src/kernel/CommandContracts.ts",
+        "category": "kernel",
+        "responsibility": "Extension contracts and public catalogs",
+        "lines": 141,
+        "complexity": 6
+      },
+      {
+        "path": "src/kernel/EditContracts.ts",
+        "category": "kernel",
+        "responsibility": "Extension contracts and public catalogs",
+        "lines": 96,
+        "complexity": 2
+      },
+      {
+        "path": "src/kernel/index.ts",
+        "category": "kernel",
+        "responsibility": "Extension contracts and public catalogs",
+        "lines": 4,
+        "complexity": 1
+      },
+      {
+        "path": "src/kernel/PluginContracts.ts",
+        "category": "kernel",
+        "responsibility": "Extension contracts and public catalogs",
+        "lines": 87,
+        "complexity": 6
+      },
+      {
+        "path": "src/kernel/Registries.ts",
+        "category": "kernel",
+        "responsibility": "Extension contracts and public catalogs",
+        "lines": 115,
+        "complexity": 6
+      },
+      {
+        "path": "src/plugins/builtin-commands/BuiltinCommandService.ts",
+        "category": "plugin",
+        "responsibility": "Built-in Command plugin",
+        "lines": 440,
+        "complexity": 30
+      },
+      {
+        "path": "src/plugins/builtin-commands/index.ts",
+        "category": "plugin",
+        "responsibility": "Built-in Command plugin",
+        "lines": 112,
+        "complexity": 2
+      },
+      {
+        "path": "src/plugins/builtin-shapes/index.ts",
+        "category": "plugin",
+        "responsibility": "Built-in ShapeProvider plugin",
+        "lines": 230,
+        "complexity": 11
+      },
+      {
+        "path": "src/shared/EditorError.ts",
+        "category": "kernel",
+        "responsibility": "Shared error type",
+        "lines": 6,
+        "complexity": 1
+      }
+    ]
+  },
+  "files": [
+    {
+      "path": "src/application/commands/AddToCommand.ts",
+      "category": "kernel",
+      "responsibility": "Editing operations, snapshots, and undo/redo",
+      "lines": 26,
+      "complexity": 3
+    },
+    {
+      "path": "src/application/commands/BackCommand.ts",
+      "category": "kernel",
+      "responsibility": "Editing operations, snapshots, and undo/redo",
+      "lines": 21,
+      "complexity": 1
+    },
+    {
+      "path": "src/application/commands/CreateCommand.ts",
+      "category": "kernel",
+      "responsibility": "Editing operations, snapshots, and undo/redo",
+      "lines": 40,
+      "complexity": 4
+    },
+    {
+      "path": "src/application/commands/DeleteCommand.ts",
+      "category": "kernel",
+      "responsibility": "Editing operations, snapshots, and undo/redo",
+      "lines": 22,
+      "complexity": 3
+    },
+    {
+      "path": "src/application/commands/FrontCommand.ts",
+      "category": "kernel",
+      "responsibility": "Editing operations, snapshots, and undo/redo",
+      "lines": 21,
+      "complexity": 1
+    },
+    {
+      "path": "src/application/commands/GroupCommand.ts",
+      "category": "kernel",
+      "responsibility": "Editing operations, snapshots, and undo/redo",
+      "lines": 25,
+      "complexity": 1
+    },
+    {
+      "path": "src/application/commands/MoveCommand.ts",
+      "category": "kernel",
+      "responsibility": "Editing operations, snapshots, and undo/redo",
+      "lines": 26,
+      "complexity": 1
+    },
+    {
+      "path": "src/application/commands/ScaleCommand.ts",
+      "category": "kernel",
+      "responsibility": "Editing operations, snapshots, and undo/redo",
+      "lines": 24,
+      "complexity": 1
+    },
+    {
+      "path": "src/application/commands/SetCommand.ts",
+      "category": "kernel",
+      "responsibility": "Editing operations, snapshots, and undo/redo",
+      "lines": 57,
+      "complexity": 3
+    },
+    {
+      "path": "src/application/commands/UngroupCommand.ts",
+      "category": "kernel",
+      "responsibility": "Editing operations, snapshots, and undo/redo",
+      "lines": 20,
+      "complexity": 1
+    },
+    {
+      "path": "src/application/EditCommand.ts",
+      "category": "kernel",
+      "responsibility": "Editing operations, snapshots, and undo/redo",
+      "lines": 1,
+      "complexity": 1
+    },
+    {
+      "path": "src/application/Editor.ts",
+      "category": "kernel",
+      "responsibility": "Editing operations, snapshots, and undo/redo",
+      "lines": 124,
+      "complexity": 3
+    },
+    {
+      "path": "src/application/EditResult.ts",
+      "category": "kernel",
+      "responsibility": "Editing operations, snapshots, and undo/redo",
+      "lines": 13,
+      "complexity": 1
+    },
+    {
+      "path": "src/application/History.ts",
+      "category": "kernel",
+      "responsibility": "Editing operations, snapshots, and undo/redo",
+      "lines": 59,
+      "complexity": 4
+    },
+    {
+      "path": "src/bootstrap/ApplicationAssembler.ts",
+      "category": "assembly",
+      "responsibility": "Plugin activation, validation, and composition root",
+      "lines": 154,
+      "complexity": 38
+    },
+    {
+      "path": "src/bootstrap/PluginHost.ts",
+      "category": "assembly",
+      "responsibility": "Plugin activation, validation, and composition root",
+      "lines": 273,
+      "complexity": 27
+    },
+    {
+      "path": "src/cli/Cli.ts",
+      "category": "assembly",
+      "responsibility": "Command parsing, dispatch, output, and process entry",
+      "lines": 53,
+      "complexity": 12
+    },
+    {
+      "path": "src/cli/CommandExecutor.ts",
+      "category": "assembly",
+      "responsibility": "Command parsing, dispatch, output, and process entry",
+      "lines": 42,
+      "complexity": 7
+    },
+    {
+      "path": "src/cli/CommandLexer.ts",
+      "category": "assembly",
+      "responsibility": "Command parsing, dispatch, output, and process entry",
+      "lines": 76,
+      "complexity": 14
+    },
+    {
+      "path": "src/cli/CommandParser.ts",
+      "category": "assembly",
+      "responsibility": "Command parsing, dispatch, output, and process entry",
+      "lines": 20,
+      "complexity": 2
+    },
+    {
+      "path": "src/cli/CommandRouter.ts",
+      "category": "assembly",
+      "responsibility": "Command parsing, dispatch, output, and process entry",
+      "lines": 22,
+      "complexity": 2
+    },
+    {
+      "path": "src/cli/main.ts",
+      "category": "assembly",
+      "responsibility": "Command parsing, dispatch, output, and process entry",
+      "lines": 5,
+      "complexity": 1
+    },
+    {
+      "path": "src/cli/OutputFormatter.ts",
+      "category": "assembly",
+      "responsibility": "Command parsing, dispatch, output, and process entry",
+      "lines": 374,
+      "complexity": 44
+    },
+    {
+      "path": "src/domain/CanvasDocument.ts",
+      "category": "kernel",
+      "responsibility": "Shape model and document invariants",
+      "lines": 436,
+      "complexity": 76
+    },
+    {
+      "path": "src/domain/Circle.ts",
+      "category": "kernel",
+      "responsibility": "Shape model and document invariants",
+      "lines": 127,
+      "complexity": 10
+    },
+    {
+      "path": "src/domain/CompositeShape.ts",
+      "category": "kernel",
+      "responsibility": "Shape model and document invariants",
+      "lines": 91,
+      "complexity": 13
+    },
+    {
+      "path": "src/domain/Ellipse.ts",
+      "category": "kernel",
+      "responsibility": "Shape model and document invariants",
+      "lines": 144,
+      "complexity": 12
+    },
+    {
+      "path": "src/domain/Group.ts",
+      "category": "kernel",
+      "responsibility": "Shape model and document invariants",
+      "lines": 51,
+      "complexity": 5
+    },
+    {
+      "path": "src/domain/Line.ts",
+      "category": "kernel",
+      "responsibility": "Shape model and document invariants",
+      "lines": 143,
+      "complexity": 12
+    },
+    {
+      "path": "src/domain/Rect.ts",
+      "category": "kernel",
+      "responsibility": "Shape model and document invariants",
+      "lines": 144,
+      "complexity": 12
+    },
+    {
+      "path": "src/domain/Shape.ts",
+      "category": "kernel",
+      "responsibility": "Shape model and document invariants",
+      "lines": 250,
+      "complexity": 26
+    },
+    {
+      "path": "src/domain/Text.ts",
+      "category": "kernel",
+      "responsibility": "Shape model and document invariants",
+      "lines": 122,
+      "complexity": 10
+    },
+    {
+      "path": "src/infrastructure/NodeDirectoryReader.ts",
+      "category": "assembly",
+      "responsibility": "SVG and filesystem adapters",
+      "lines": 36,
+      "complexity": 4
+    },
+    {
+      "path": "src/infrastructure/SvgIoAdapter.ts",
+      "category": "assembly",
+      "responsibility": "SVG and filesystem adapters",
+      "lines": 22,
+      "complexity": 1
+    },
+    {
+      "path": "src/infrastructure/SvgReader.ts",
+      "category": "assembly",
+      "responsibility": "SVG and filesystem adapters",
+      "lines": 216,
+      "complexity": 33
+    },
+    {
+      "path": "src/infrastructure/SvgWriter.ts",
+      "category": "assembly",
+      "responsibility": "SVG and filesystem adapters",
+      "lines": 85,
+      "complexity": 6
+    },
+    {
+      "path": "src/kernel/CommandContracts.ts",
+      "category": "kernel",
+      "responsibility": "Extension contracts and public catalogs",
+      "lines": 141,
+      "complexity": 6
+    },
+    {
+      "path": "src/kernel/EditContracts.ts",
+      "category": "kernel",
+      "responsibility": "Extension contracts and public catalogs",
+      "lines": 96,
+      "complexity": 2
+    },
+    {
+      "path": "src/kernel/index.ts",
+      "category": "kernel",
+      "responsibility": "Extension contracts and public catalogs",
+      "lines": 4,
+      "complexity": 1
+    },
+    {
+      "path": "src/kernel/PluginContracts.ts",
+      "category": "kernel",
+      "responsibility": "Extension contracts and public catalogs",
+      "lines": 87,
+      "complexity": 6
+    },
+    {
+      "path": "src/kernel/Registries.ts",
+      "category": "kernel",
+      "responsibility": "Extension contracts and public catalogs",
+      "lines": 115,
+      "complexity": 6
+    },
+    {
+      "path": "src/plugins/builtin-commands/BuiltinCommandService.ts",
+      "category": "plugin",
+      "responsibility": "Built-in Command plugin",
+      "lines": 440,
+      "complexity": 30
+    },
+    {
+      "path": "src/plugins/builtin-commands/index.ts",
+      "category": "plugin",
+      "responsibility": "Built-in Command plugin",
+      "lines": 112,
+      "complexity": 2
+    },
+    {
+      "path": "src/plugins/builtin-shapes/index.ts",
+      "category": "plugin",
+      "responsibility": "Built-in ShapeProvider plugin",
+      "lines": 230,
+      "complexity": 11
+    },
+    {
+      "path": "src/shared/EditorError.ts",
+      "category": "kernel",
+      "responsibility": "Shared error type",
+      "lines": 6,
+      "complexity": 1
+    }
+  ]
+}

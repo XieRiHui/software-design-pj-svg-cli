@@ -2,8 +2,6 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import ts from "typescript";
-
 const options = parseArguments(process.argv.slice(2));
 const baseRef = options.base;
 const targetRef = options.target;
@@ -95,7 +93,7 @@ function analyzeFile(path, source) {
     category: categoryOf(path),
     responsibility: responsibilityOf(path),
     lines: countLines(source),
-    complexity: cyclomaticComplexity(path, source),
+    complexity: cyclomaticComplexity(source),
   };
 }
 
@@ -104,41 +102,86 @@ function countLines(source) {
   return normalized.length === 0 ? 0 : normalized.split("\n").length;
 }
 
-function cyclomaticComplexity(path, source) {
-  const sourceFile = ts.createSourceFile(
-    path,
-    source,
-    ts.ScriptTarget.Latest,
-    true,
-    ts.ScriptKind.TS,
-  );
-  let complexity = 1;
+function cyclomaticComplexity(source) {
+  const code = maskCommentsAndStrings(source);
+  const keywords = code.match(/\b(?:if|for|while|do|case|catch)\b/g)?.length ?? 0;
+  const logical = code.match(/&&|\|\||\?\?/g)?.length ?? 0;
+  const conditional = code.match(/\?(?![.?])/g)?.length ?? 0;
+  return 1 + keywords + logical + conditional;
+}
 
-  const visit = (node) => {
-    if (
-      ts.isIfStatement(node) ||
-      ts.isConditionalExpression(node) ||
-      ts.isForStatement(node) ||
-      ts.isForInStatement(node) ||
-      ts.isForOfStatement(node) ||
-      ts.isWhileStatement(node) ||
-      ts.isDoStatement(node) ||
-      ts.isCaseClause(node) ||
-      ts.isCatchClause(node) ||
-      (ts.isBinaryExpression(node) &&
-        [
-          ts.SyntaxKind.AmpersandAmpersandToken,
-          ts.SyntaxKind.BarBarToken,
-          ts.SyntaxKind.QuestionQuestionToken,
-        ].includes(node.operatorToken.kind))
-    ) {
-      complexity += 1;
+function maskCommentsAndStrings(source) {
+  const characters = [...source];
+  let quote;
+  let lineComment = false;
+  let blockComment = false;
+
+  for (let index = 0; index < characters.length; index += 1) {
+    const character = characters[index];
+    const next = characters[index + 1];
+
+    if (lineComment) {
+      if (character === "\n") {
+        lineComment = false;
+      } else {
+        characters[index] = " ";
+      }
+      continue;
     }
-    ts.forEachChild(node, visit);
-  };
 
-  visit(sourceFile);
-  return complexity;
+    if (blockComment) {
+      if (character === "*" && next === "/") {
+        characters[index] = " ";
+        characters[index + 1] = " ";
+        index += 1;
+        blockComment = false;
+      } else if (character !== "\n") {
+        characters[index] = " ";
+      }
+      continue;
+    }
+
+    if (quote !== undefined) {
+      if (character === "\\") {
+        if (character !== "\n") {
+          characters[index] = " ";
+        }
+        if (next !== undefined && next !== "\n") {
+          characters[index + 1] = " ";
+        }
+        index += 1;
+      } else if (character === quote) {
+        characters[index] = " ";
+        quote = undefined;
+      } else if (character !== "\n") {
+        characters[index] = " ";
+      }
+      continue;
+    }
+
+    if (character === "/" && next === "/") {
+      characters[index] = " ";
+      characters[index + 1] = " ";
+      index += 1;
+      lineComment = true;
+      continue;
+    }
+
+    if (character === "/" && next === "*") {
+      characters[index] = " ";
+      characters[index + 1] = " ";
+      index += 1;
+      blockComment = true;
+      continue;
+    }
+
+    if (character === "\"" || character === "'" || character === "`") {
+      quote = character;
+      characters[index] = " ";
+    }
+  }
+
+  return characters.join("");
 }
 
 function categoryOf(path) {
