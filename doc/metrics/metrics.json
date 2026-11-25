@@ -1,7 +1,7 @@
 {
   "baseRef": "final",
-  "targetRef": "HEAD",
-  "targetLabel": "framework",
+  "targetRef": "p2",
+  "targetLabel": "p2",
   "categories": [
     "kernel",
     "assembly",
@@ -275,32 +275,32 @@
     "categories": {
       "kernel": {
         "files": 29,
-        "lines": 2436,
-        "complexity": 226
+        "lines": 2493,
+        "complexity": 244
       },
       "assembly": {
-        "files": 13,
-        "lines": 1378,
-        "complexity": 191
+        "files": 16,
+        "lines": 1717,
+        "complexity": 253
       },
       "plugin": {
-        "files": 3,
-        "lines": 782,
-        "complexity": 43
+        "files": 11,
+        "lines": 1635,
+        "complexity": 124
       }
     },
     "total": {
-      "files": 45,
-      "lines": 4596,
-      "complexity": 460
+      "files": 56,
+      "lines": 5845,
+      "complexity": 621
     },
     "files": [
       {
         "path": "src/application/commands/AddToCommand.ts",
         "category": "kernel",
         "responsibility": "Editing operations, snapshots, and undo/redo",
-        "lines": 26,
-        "complexity": 3
+        "lines": 32,
+        "complexity": 5
       },
       {
         "path": "src/application/commands/BackCommand.ts",
@@ -313,15 +313,15 @@
         "path": "src/application/commands/CreateCommand.ts",
         "category": "kernel",
         "responsibility": "Editing operations, snapshots, and undo/redo",
-        "lines": 40,
-        "complexity": 4
+        "lines": 46,
+        "complexity": 6
       },
       {
         "path": "src/application/commands/DeleteCommand.ts",
         "category": "kernel",
         "responsibility": "Editing operations, snapshots, and undo/redo",
-        "lines": 22,
-        "complexity": 3
+        "lines": 26,
+        "complexity": 4
       },
       {
         "path": "src/application/commands/FrontCommand.ts",
@@ -355,8 +355,8 @@
         "path": "src/application/commands/SetCommand.ts",
         "category": "kernel",
         "responsibility": "Editing operations, snapshots, and undo/redo",
-        "lines": 57,
-        "complexity": 3
+        "lines": 74,
+        "complexity": 6
       },
       {
         "path": "src/application/commands/UngroupCommand.ts",
@@ -401,6 +401,27 @@
         "complexity": 38
       },
       {
+        "path": "src/bootstrap/codeAssembly.ts",
+        "category": "assembly",
+        "responsibility": "Plugin activation, validation, and composition root",
+        "lines": 30,
+        "complexity": 1
+      },
+      {
+        "path": "src/bootstrap/configuredAssembly.ts",
+        "category": "assembly",
+        "responsibility": "Plugin activation, validation, and composition root",
+        "lines": 36,
+        "complexity": 7
+      },
+      {
+        "path": "src/bootstrap/PluginConfigLoader.ts",
+        "category": "assembly",
+        "responsibility": "Plugin activation, validation, and composition root",
+        "lines": 200,
+        "complexity": 36
+      },
+      {
         "path": "src/bootstrap/PluginHost.ts",
         "category": "assembly",
         "responsibility": "Plugin activation, validation, and composition root",
@@ -411,8 +432,8 @@
         "path": "src/cli/Cli.ts",
         "category": "assembly",
         "responsibility": "Command parsing, dispatch, output, and process entry",
-        "lines": 53,
-        "complexity": 12
+        "lines": 59,
+        "complexity": 16
       },
       {
         "path": "src/cli/CommandExecutor.ts",
@@ -446,15 +467,15 @@
         "path": "src/cli/main.ts",
         "category": "assembly",
         "responsibility": "Command parsing, dispatch, output, and process entry",
-        "lines": 5,
-        "complexity": 1
+        "lines": 59,
+        "complexity": 9
       },
       {
         "path": "src/cli/OutputFormatter.ts",
         "category": "assembly",
         "responsibility": "Command parsing, dispatch, output, and process entry",
-        "lines": 374,
-        "complexity": 44
+        "lines": 387,
+        "complexity": 50
       },
       {
         "path": "src/domain/CanvasDocument.ts",
@@ -509,7 +530,7 @@
         "path": "src/domain/Shape.ts",
         "category": "kernel",
         "responsibility": "Shape model and document invariants",
-        "lines": 250,
+        "lines": 258,
         "complexity": 26
       },
       {
@@ -558,8 +579,8 @@
         "path": "src/kernel/EditContracts.ts",
         "category": "kernel",
         "responsibility": "Extension contracts and public catalogs",
-        "lines": 96,
-        "complexity": 2
+        "lines": 104,
+        "complexity": 10
       },
       {
         "path": "src/kernel/index.ts",
@@ -572,8 +593,8 @@
         "path": "src/kernel/PluginContracts.ts",
         "category": "kernel",
         "responsibility": "Extension contracts and public catalogs",
-        "lines": 87,
-        "complexity": 6
+        "lines": 95,
+        "complexity": 8
       },
       {
         "path": "src/kernel/Registries.ts",
@@ -604,6 +625,62 @@
         "complexity": 11
       },
       {
+        "path": "src/plugins/command-dir/index.ts",
+        "category": "plugin",
+        "responsibility": "Optional plugin implementation",
+        "lines": 91,
+        "complexity": 7
+      },
+      {
+        "path": "src/plugins/command-stats/index.ts",
+        "category": "plugin",
+        "responsibility": "Optional plugin implementation",
+        "lines": 80,
+        "complexity": 9
+      },
+      {
+        "path": "src/plugins/shape-arrow/Arrow.ts",
+        "category": "plugin",
+        "responsibility": "Optional plugin implementation",
+        "lines": 178,
+        "complexity": 14
+      },
+      {
+        "path": "src/plugins/shape-arrow/index.ts",
+        "category": "plugin",
+        "responsibility": "Optional plugin implementation",
+        "lines": 90,
+        "complexity": 9
+      },
+      {
+        "path": "src/plugins/shape-box/Box.ts",
+        "category": "plugin",
+        "responsibility": "Optional plugin implementation",
+        "lines": 184,
+        "complexity": 13
+      },
+      {
+        "path": "src/plugins/shape-box/index.ts",
+        "category": "plugin",
+        "responsibility": "Optional plugin implementation",
+        "lines": 117,
+        "complexity": 16
+      },
+      {
+        "path": "src/plugins/tree-box-label/index.ts",
+        "category": "plugin",
+        "responsibility": "Optional plugin implementation",
+        "lines": 25,
+        "complexity": 2
+      },
+      {
+        "path": "src/plugins/tree-star/index.ts",
+        "category": "plugin",
+        "responsibility": "Optional plugin implementation",
+        "lines": 88,
+        "complexity": 11
+      },
+      {
         "path": "src/shared/EditorError.ts",
         "category": "kernel",
         "responsibility": "Shared error type",
@@ -617,8 +694,8 @@
       "path": "src/application/commands/AddToCommand.ts",
       "category": "kernel",
       "responsibility": "Editing operations, snapshots, and undo/redo",
-      "lines": 26,
-      "complexity": 3
+      "lines": 32,
+      "complexity": 5
     },
     {
       "path": "src/application/commands/BackCommand.ts",
@@ -631,15 +708,15 @@
       "path": "src/application/commands/CreateCommand.ts",
       "category": "kernel",
       "responsibility": "Editing operations, snapshots, and undo/redo",
-      "lines": 40,
-      "complexity": 4
+      "lines": 46,
+      "complexity": 6
     },
     {
       "path": "src/application/commands/DeleteCommand.ts",
       "category": "kernel",
       "responsibility": "Editing operations, snapshots, and undo/redo",
-      "lines": 22,
-      "complexity": 3
+      "lines": 26,
+      "complexity": 4
     },
     {
       "path": "src/application/commands/FrontCommand.ts",
@@ -673,8 +750,8 @@
       "path": "src/application/commands/SetCommand.ts",
       "category": "kernel",
       "responsibility": "Editing operations, snapshots, and undo/redo",
-      "lines": 57,
-      "complexity": 3
+      "lines": 74,
+      "complexity": 6
     },
     {
       "path": "src/application/commands/UngroupCommand.ts",
@@ -719,6 +796,27 @@
       "complexity": 38
     },
     {
+      "path": "src/bootstrap/codeAssembly.ts",
+      "category": "assembly",
+      "responsibility": "Plugin activation, validation, and composition root",
+      "lines": 30,
+      "complexity": 1
+    },
+    {
+      "path": "src/bootstrap/configuredAssembly.ts",
+      "category": "assembly",
+      "responsibility": "Plugin activation, validation, and composition root",
+      "lines": 36,
+      "complexity": 7
+    },
+    {
+      "path": "src/bootstrap/PluginConfigLoader.ts",
+      "category": "assembly",
+      "responsibility": "Plugin activation, validation, and composition root",
+      "lines": 200,
+      "complexity": 36
+    },
+    {
       "path": "src/bootstrap/PluginHost.ts",
       "category": "assembly",
       "responsibility": "Plugin activation, validation, and composition root",
@@ -729,8 +827,8 @@
       "path": "src/cli/Cli.ts",
       "category": "assembly",
       "responsibility": "Command parsing, dispatch, output, and process entry",
-      "lines": 53,
-      "complexity": 12
+      "lines": 59,
+      "complexity": 16
     },
     {
       "path": "src/cli/CommandExecutor.ts",
@@ -764,15 +862,15 @@
       "path": "src/cli/main.ts",
       "category": "assembly",
       "responsibility": "Command parsing, dispatch, output, and process entry",
-      "lines": 5,
-      "complexity": 1
+      "lines": 59,
+      "complexity": 9
     },
     {
       "path": "src/cli/OutputFormatter.ts",
       "category": "assembly",
       "responsibility": "Command parsing, dispatch, output, and process entry",
-      "lines": 374,
-      "complexity": 44
+      "lines": 387,
+      "complexity": 50
     },
     {
       "path": "src/domain/CanvasDocument.ts",
@@ -827,7 +925,7 @@
       "path": "src/domain/Shape.ts",
       "category": "kernel",
       "responsibility": "Shape model and document invariants",
-      "lines": 250,
+      "lines": 258,
       "complexity": 26
     },
     {
@@ -876,8 +974,8 @@
       "path": "src/kernel/EditContracts.ts",
       "category": "kernel",
       "responsibility": "Extension contracts and public catalogs",
-      "lines": 96,
-      "complexity": 2
+      "lines": 104,
+      "complexity": 10
     },
     {
       "path": "src/kernel/index.ts",
@@ -890,8 +988,8 @@
       "path": "src/kernel/PluginContracts.ts",
       "category": "kernel",
       "responsibility": "Extension contracts and public catalogs",
-      "lines": 87,
-      "complexity": 6
+      "lines": 95,
+      "complexity": 8
     },
     {
       "path": "src/kernel/Registries.ts",
@@ -919,6 +1017,62 @@
       "category": "plugin",
       "responsibility": "Built-in ShapeProvider plugin",
       "lines": 230,
+      "complexity": 11
+    },
+    {
+      "path": "src/plugins/command-dir/index.ts",
+      "category": "plugin",
+      "responsibility": "Optional plugin implementation",
+      "lines": 91,
+      "complexity": 7
+    },
+    {
+      "path": "src/plugins/command-stats/index.ts",
+      "category": "plugin",
+      "responsibility": "Optional plugin implementation",
+      "lines": 80,
+      "complexity": 9
+    },
+    {
+      "path": "src/plugins/shape-arrow/Arrow.ts",
+      "category": "plugin",
+      "responsibility": "Optional plugin implementation",
+      "lines": 178,
+      "complexity": 14
+    },
+    {
+      "path": "src/plugins/shape-arrow/index.ts",
+      "category": "plugin",
+      "responsibility": "Optional plugin implementation",
+      "lines": 90,
+      "complexity": 9
+    },
+    {
+      "path": "src/plugins/shape-box/Box.ts",
+      "category": "plugin",
+      "responsibility": "Optional plugin implementation",
+      "lines": 184,
+      "complexity": 13
+    },
+    {
+      "path": "src/plugins/shape-box/index.ts",
+      "category": "plugin",
+      "responsibility": "Optional plugin implementation",
+      "lines": 117,
+      "complexity": 16
+    },
+    {
+      "path": "src/plugins/tree-box-label/index.ts",
+      "category": "plugin",
+      "responsibility": "Optional plugin implementation",
+      "lines": 25,
+      "complexity": 2
+    },
+    {
+      "path": "src/plugins/tree-star/index.ts",
+      "category": "plugin",
+      "responsibility": "Optional plugin implementation",
+      "lines": 88,
       "complexity": 11
     },
     {
