@@ -8,6 +8,12 @@
     },
     {
       "module": "../../../src/plugins/shape-box/index.ts"
+    },
+    {
+      "module": "../../../src/plugins/tree-box-label/index.ts"
+    },
+    {
+      "module": "../../../src/plugins/tree-star/index.ts"
     }
   ]
 }
