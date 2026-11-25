@@ -15,21 +15,27 @@ export interface CliOptions {
   readonly executor?: CommandExecutor;
   readonly input?: Readable;
   readonly output?: CliOutput;
+  readonly startupMessages?: readonly string[];
 }
 
 export class Cli {
   private readonly executor: CommandExecutor;
   private readonly input: Readable;
   private readonly output: CliOutput;
+  private readonly startupMessages: readonly string[];
 
   public constructor(options: CliOptions = {}) {
     this.executor = options.executor ?? new CommandExecutor();
     this.input = options.input ?? process.stdin;
     this.output = options.output ?? process.stdout;
+    this.startupMessages = options.startupMessages ?? [];
   }
 
   public async start(): Promise<void> {
     this.output.write(STARTUP_BANNER);
+    for (const message of this.startupMessages) {
+      this.output.write(`${message}\n`);
+    }
 
     const lines = createInterface({
       input: this.input,

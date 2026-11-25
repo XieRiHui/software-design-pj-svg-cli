@@ -1,0 +1,13 @@
+{
+  "name": "duplicate-fixture",
+  "private": true,
+  "type": "module",
+  "contributes": {
+    "commands": [
+      "stats"
+    ],
+    "decorators": [
+      "must-rollback"
+    ]
+  }
+}

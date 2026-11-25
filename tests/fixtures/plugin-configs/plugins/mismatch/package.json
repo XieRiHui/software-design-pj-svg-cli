@@ -1,0 +1,10 @@
+{
+  "name": "mismatch-fixture",
+  "private": true,
+  "type": "module",
+  "contributes": {
+    "commands": [
+      "declared"
+    ]
+  }
+}

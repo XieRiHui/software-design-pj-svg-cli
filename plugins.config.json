@@ -1,0 +1,10 @@
+{
+  "plugins": [
+    {
+      "module": "./dist/plugins/command-stats/index.js"
+    },
+    {
+      "module": "./dist/plugins/command-dir/index.js"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "plugins": [
+    {
+      "module": "../../../src/plugins/command-stats/index.ts"
+    },
+    {
+      "module": "./plugins/duplicate/index.ts"
+    },
+    {
+      "module": "./plugins/fallback/index.ts"
+    }
+  ]
+}

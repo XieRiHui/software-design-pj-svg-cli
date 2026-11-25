@@ -1,0 +1,10 @@
+{
+  "plugins": [
+    {
+      "module": "../../../src/plugins/command-stats/index.ts"
+    },
+    {
+      "module": "../../../src/plugins/command-dir/index.ts"
+    }
+  ]
+}

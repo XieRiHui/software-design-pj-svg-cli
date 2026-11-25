@@ -11,6 +11,8 @@
   },
   "scripts": {
     "cli": "tsx src/cli/main.ts",
+    "cli:builtins": "tsx src/cli/main.ts --builtins-only",
+    "cli:config": "tsx src/cli/main.ts --config plugins.config.json",
     "build": "tsc -p tsconfig.build.json && node scripts/copy-plugin-manifests.mjs",
     "metrics": "node scripts/generate-metrics.mjs",
     "typecheck": "tsc --noEmit",

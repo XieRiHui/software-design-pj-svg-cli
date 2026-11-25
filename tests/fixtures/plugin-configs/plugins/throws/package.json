@@ -1,0 +1,6 @@
+{
+  "name": "throws-fixture",
+  "private": true,
+  "type": "module",
+  "contributes": {}
+}

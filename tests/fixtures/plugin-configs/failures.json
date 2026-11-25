@@ -1,0 +1,19 @@
+{
+  "plugins": [
+    {
+      "module": "../../../src/plugins/command-stats/index.ts"
+    },
+    {
+      "module": "./plugins/no-default/index.ts"
+    },
+    {
+      "module": "./plugins/mismatch/index.ts"
+    },
+    {
+      "module": "./plugins/throws/index.ts"
+    },
+    {
+      "module": "./not-there.js"
+    }
+  ]
+}

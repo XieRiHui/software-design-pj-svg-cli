@@ -1,0 +1,10 @@
+{
+  "name": "fallback-fixture",
+  "private": true,
+  "type": "module",
+  "contributes": {
+    "commands": [
+      "fallback"
+    ]
+  }
+}
