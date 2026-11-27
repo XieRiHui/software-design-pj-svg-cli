@@ -10,6 +10,9 @@
       "module": "./dist/plugins/shape-box/index.js"
     },
     {
+      "module": "./dist/plugins/shape-arrow/index.js"
+    },
+    {
       "module": "./dist/plugins/tree-box-label/index.js"
     },
     {
