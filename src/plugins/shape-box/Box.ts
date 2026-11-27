@@ -23,7 +23,14 @@ export class Box extends CompositeShape {
   ): Box {
     const box = new Box(id);
     box.appendChild(
-      new Rect(`${id}-rect`, x, y, width, height),
+      new Rect(
+        `${id}-rect`,
+        x,
+        y,
+        width,
+        height,
+        "#4a90d9",
+      ),
     );
     box.appendChild(
       new Text(`${id}-label`, x + 20, y + 35, label),
@@ -32,6 +39,14 @@ export class Box extends CompositeShape {
   }
 
   public get typeName(): string {
+    return "box";
+  }
+
+  public override get serializationName(): string {
+    return "g";
+  }
+
+  public override get treeTypeName(): string {
     return "g";
   }
 
@@ -69,6 +84,15 @@ export class Box extends CompositeShape {
 
   public override getTreeSummary(): string {
     return "";
+  }
+
+  public override getCreationDetails(): string {
+    return [
+      `${this.serializationName}#${this.id}`,
+      ...this.children.map(
+        (child) => `${child.typeName}#${child.id}`,
+      ),
+    ].join(" + ");
   }
 
   public override getShowAttributes(): readonly ShapeAttribute[] {

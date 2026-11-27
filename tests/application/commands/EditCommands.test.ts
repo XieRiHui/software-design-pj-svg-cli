@@ -34,6 +34,7 @@ describe("edit commands", () => {
       typeName: "rect",
       id: "r1",
       containerId: "g1",
+      containerTypeName: "g",
     });
     expect(document.getShape("r1")).toBeInstanceOf(Rect);
     expect(document.getParent("r1")?.id).toBe("g1");
@@ -72,6 +73,7 @@ describe("edit commands", () => {
       typeName: "rect",
       id: "r1",
       parentId: "g1",
+      parentTypeName: "g",
     });
     expect(document.getShape("r1")).toBeUndefined();
   });
@@ -136,6 +138,7 @@ describe("edit commands", () => {
       id: "rect",
       groupId: "first",
       previousParentId: null,
+      groupTypeName: "g",
     });
     expect(new FrontCommand("rect").execute(document).kind).toBe(
       "reorder",

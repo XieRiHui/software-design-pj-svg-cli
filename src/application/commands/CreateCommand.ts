@@ -29,12 +29,18 @@ export class CreateCommand extends EditCommand {
       shape,
       this.containerId ?? undefined,
     );
+    const container = document.getParent(shape.id);
+    const details = shape.getCreationDetails();
 
     return {
       kind: "create",
       typeName: shape.typeName,
       id: shape.id,
       containerId: this.containerId,
+      ...(container === undefined
+        ? {}
+        : { containerTypeName: container.typeName }),
+      ...(details === undefined ? {} : { details }),
     };
   }
 }

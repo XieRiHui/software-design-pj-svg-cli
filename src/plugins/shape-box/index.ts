@@ -2,6 +2,7 @@ import { type Shape } from "../../domain/Shape.js";
 import {
   type AttributeApplyContext,
   type AttributeHandler,
+  type AttributeHandlerResult,
   type PluginActivationContext,
   type PluginDefinition,
   type ShapeProvider,
@@ -58,18 +59,29 @@ class BoxAttributeHandler implements AttributeHandler {
     );
   }
 
-  public apply(context: AttributeApplyContext): void {
+  public apply(
+    context: AttributeApplyContext,
+  ): AttributeHandlerResult {
     if (!(context.shape instanceof Box)) {
       throw new EditorError("box attribute handler received another shape");
     }
 
     if (context.attribute === "fill") {
       context.shape.setFill(context.value);
-      return;
+      return {
+        message: `fill propagated to ${context.shape.id}-rect`,
+        undoMessage: "fill propagation undone",
+        redoMessage: `fill propagated to ${context.shape.id}-rect`,
+      };
     }
     if (context.attribute === "label") {
+      const previous = context.shape.label ?? "";
       context.shape.setLabel(context.value);
-      return;
+      return {
+        message: `label updated: "${context.value}"`,
+        undoMessage: `label restored: "${previous}"`,
+        redoMessage: `label updated: "${context.value}"`,
+      };
     }
 
     throw new EditorError(

@@ -1,7 +1,12 @@
 import { EditCommand } from "../EditCommand.js";
 import { type EditResult } from "../EditResult.js";
 import { type CanvasDocument } from "../../domain/CanvasDocument.js";
-import { type AttributeHandlerCatalog } from "../../kernel/CommandContracts.js";
+import {
+  type AttributeHandlerCatalog,
+} from "../../kernel/CommandContracts.js";
+import {
+  type AttributeHandlerResult,
+} from "../../kernel/PluginContracts.js";
 import { EditorError } from "../../shared/EditorError.js";
 
 const NO_ATTRIBUTE_HANDLERS: AttributeHandlerCatalog = {
@@ -35,10 +40,11 @@ export class SetCommand extends EditCommand {
     }
 
     const handler = handlers[0];
+    let handlerResult: AttributeHandlerResult | void = undefined;
     if (handler === undefined) {
       shape.setAttribute(this.attribute, this.value);
     } else {
-      handler.apply({
+      handlerResult = handler.apply({
         document,
         shape,
         attribute: this.attribute,
@@ -52,6 +58,17 @@ export class SetCommand extends EditCommand {
       id: shape.id,
       attribute: this.attribute,
       value: this.value,
+      ...(handlerResult === undefined
+        ? {}
+        : {
+          message: handlerResult.message,
+          ...(handlerResult.undoMessage === undefined
+            ? {}
+            : { undoMessage: handlerResult.undoMessage }),
+          ...(handlerResult.redoMessage === undefined
+            ? {}
+            : { redoMessage: handlerResult.redoMessage }),
+        }),
     };
   }
 }

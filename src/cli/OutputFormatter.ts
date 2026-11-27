@@ -85,7 +85,7 @@ export class OutputFormatter {
           ? `${result.typeName}#${result.id} scale undone`
           : `${result.typeName}#${result.id} scaled by ${result.factor}`;
       case "set":
-        return this.formatSetResult(result, document);
+        return this.formatSetResult(result, document, direction);
       case "group":
         return direction === "undo"
           ? `g#${result.groupId} grouping undone`
@@ -96,8 +96,8 @@ export class OutputFormatter {
           : `g#${result.groupId} ungrouped`;
       case "addto":
         return direction === "undo"
-          ? `${result.typeName}#${result.id} moved back to ${result.previousParentId === null ? "svg" : `g#${result.previousParentId}`}`
-          : `${result.typeName}#${result.id} added to g#${result.groupId}`;
+          ? `${result.typeName}#${result.id} moved back to ${result.previousParentId === null ? "svg" : `${result.previousParentTypeName ?? "g"}#${result.previousParentId}`}`
+          : `${result.typeName}#${result.id} added to ${result.groupTypeName ?? "g"}#${result.groupId}`;
       case "reorder":
         return direction === "undo"
           ? `${result.typeName}#${result.id} order restored`
@@ -206,8 +206,11 @@ export class OutputFormatter {
 
     const location = result.containerId === null
       ? ""
-      : ` in g#${result.containerId}`;
-    return `${result.typeName}#${result.id} created${location}`;
+      : ` in ${result.containerTypeName ?? "g"}#${result.containerId}`;
+    const details = result.details === undefined
+      ? ""
+      : ` (${result.details})`;
+    return `${result.typeName}#${result.id} created${details}${location}`;
   }
 
   private formatDeleteResult(
@@ -217,7 +220,7 @@ export class OutputFormatter {
     if (direction === "undo") {
       return result.parentId === null
         ? `${result.typeName}#${result.id} restored to svg`
-        : `${result.typeName}#${result.id} restored into g#${result.parentId}`;
+        : `${result.typeName}#${result.id} restored into ${result.parentTypeName ?? "g"}#${result.parentId}`;
     }
 
     return `${result.typeName}#${result.id} deleted`;
@@ -244,7 +247,17 @@ export class OutputFormatter {
   private formatSetResult(
     result: Extract<EditResult, { kind: "set" }>,
     document: CanvasDocument,
+    direction: EditDirection,
   ): string {
+    const customMessage = direction === "undo"
+      ? result.undoMessage
+      : direction === "redo"
+        ? result.redoMessage
+        : result.message;
+    if (customMessage !== undefined) {
+      return `${result.typeName}#${result.id} ${customMessage}`;
+    }
+
     const current = document.getShape(result.id)?.getAttribute(
       result.attribute,
     ) ?? result.value;
@@ -294,7 +307,7 @@ export class OutputFormatter {
     savedDocument: CanvasDocument | undefined,
     saveSequence: number,
   ): string {
-    const label = `${shape.typeName}#${shape.id}`;
+    const label = `${shape.treeTypeName}#${shape.id}`;
     const summary = shape.getTreeSummary();
     const line = summary.length === 0
       ? `${prefix}${label}`

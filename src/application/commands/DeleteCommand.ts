@@ -9,7 +9,8 @@ export class DeleteCommand extends EditCommand {
 
   public override execute(document: CanvasDocument): EditResult {
     const shape = this.requireShape(document, this.shapeId);
-    const parentId = document.getParent(this.shapeId)?.id ?? null;
+    const parent = document.getParent(this.shapeId);
+    const parentId = parent?.id ?? null;
     document.removeShape(this.shapeId);
 
     return {
@@ -17,6 +18,9 @@ export class DeleteCommand extends EditCommand {
       typeName: shape.typeName,
       id: shape.id,
       parentId,
+      ...(parent === undefined
+        ? {}
+        : { parentTypeName: parent.typeName }),
     };
   }
 }

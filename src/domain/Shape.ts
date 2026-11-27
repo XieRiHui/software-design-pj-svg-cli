@@ -56,6 +56,14 @@ export abstract class Shape {
     return this.typeName;
   }
 
+  public get treeTypeName(): string {
+    return this.typeName;
+  }
+
+  public getCreationDetails(): string | undefined {
+    return undefined;
+  }
+
   public get children(): readonly Shape[] {
     return [];
   }

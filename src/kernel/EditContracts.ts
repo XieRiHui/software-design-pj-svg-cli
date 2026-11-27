@@ -9,6 +9,8 @@ export interface CreateEditResult {
   readonly typeName: string;
   readonly id: string;
   readonly containerId: string | null;
+  readonly containerTypeName?: string;
+  readonly details?: string;
 }
 
 export interface DeleteEditResult {
@@ -16,6 +18,7 @@ export interface DeleteEditResult {
   readonly typeName: string;
   readonly id: string;
   readonly parentId: string | null;
+  readonly parentTypeName?: string;
 }
 
 export interface MoveEditResult {
@@ -39,6 +42,9 @@ export interface SetEditResult {
   readonly id: string;
   readonly attribute: string;
   readonly value: string;
+  readonly message?: string;
+  readonly undoMessage?: string;
+  readonly redoMessage?: string;
 }
 
 export interface GroupEditResult {
@@ -59,6 +65,8 @@ export interface AddToEditResult {
   readonly id: string;
   readonly groupId: string;
   readonly previousParentId: string | null;
+  readonly groupTypeName?: string;
+  readonly previousParentTypeName?: string;
 }
 
 export interface ReorderEditResult {

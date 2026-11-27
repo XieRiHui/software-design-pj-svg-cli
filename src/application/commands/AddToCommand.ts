@@ -12,8 +12,10 @@ export class AddToCommand extends EditCommand {
 
   public override execute(document: CanvasDocument): EditResult {
     const shape = this.requireShape(document, this.shapeId);
-    const previousParentId = document.getParent(this.shapeId)?.id ?? null;
+    const previousParent = document.getParent(this.shapeId);
+    const previousParentId = previousParent?.id ?? null;
     document.moveShape(this.shapeId, this.groupId);
+    const group = document.getShape(this.groupId);
 
     return {
       kind: "addto",
@@ -21,6 +23,10 @@ export class AddToCommand extends EditCommand {
       id: shape.id,
       groupId: this.groupId,
       previousParentId,
+      ...(group === undefined ? {} : { groupTypeName: group.typeName }),
+      ...(previousParent === undefined
+        ? {}
+        : { previousParentTypeName: previousParent.typeName }),
     };
   }
 }

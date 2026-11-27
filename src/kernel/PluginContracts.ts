@@ -55,12 +55,20 @@ export interface AttributeApplyContext {
   readonly value: string;
 }
 
+export interface AttributeHandlerResult {
+  readonly message: string;
+  readonly undoMessage?: string;
+  readonly redoMessage?: string;
+}
+
 export interface AttributeHandler {
   readonly name: string;
 
   handles(shape: Shape, attribute: string): boolean;
 
-  apply(context: AttributeApplyContext): void;
+  apply(
+    context: AttributeApplyContext,
+  ): AttributeHandlerResult | void;
 }
 
 export interface PluginActivationContext {

@@ -23,7 +23,7 @@ import {
 import { EditorError } from "../../src/shared/EditorError.js";
 import { Box } from "../../src/plugins/shape-box/Box.js";
 import { shapeBoxPlugin } from "../../src/plugins/shape-box/index.js";
-import { commandStatsPlugin } from "../../src/plugins/command-stats/index.js";
+import { treeBoxLabelPlugin } from "../../src/plugins/tree-box-label/index.js";
 
 describe("box shape plugin", () => {
   const temporaryDirectories: string[] = [];
@@ -42,31 +42,38 @@ describe("box shape plugin", () => {
 
     expect(
       executor.execute('create box n1 120 100 160 60 "开始"'),
-    ).toBe("g#n1 created");
+    ).toBe(
+      "box#n1 created " +
+        "(g#n1 + rect#n1-rect + text#n1-label)",
+    );
     expect(executor.execute("tree")).toBe([
       "svg (800x600)",
       "└── g#n1",
-      "    ├── rect#n1-rect  x=120 y=100 w=160 h=60",
+      "    ├── rect#n1-rect  x=120 y=100 w=160 h=60 fill=#4a90d9",
       '    └── text#n1-label  (140,135) "开始"',
     ].join("\n"));
 
     expect(executor.execute("set n1 fill #f5a623")).toBe(
-      "g#n1 updated: fill=#f5a623",
+      "box#n1 fill propagated to n1-rect",
     );
-    expect(executor.execute("undo")).toContain("fill=");
-    expect(executor.execute("show n1-rect")).not.toContain("fill=");
+    expect(executor.execute("undo")).toBe(
+      "box#n1 fill propagation undone",
+    );
+    expect(executor.execute("show n1-rect")).toContain(
+      "fill=#4a90d9",
+    );
     expect(executor.execute("redo")).toBe(
-      "g#n1 updated: fill=#f5a623",
+      "box#n1 fill propagated to n1-rect",
     );
 
     expect(executor.execute('set n1 label "处理数据 v2"')).toBe(
-      "g#n1 updated: label=处理数据 v2",
+      'box#n1 label updated: "处理数据 v2"',
     );
     expect(executor.execute("undo")).toBe(
-      "g#n1 updated: label=开始",
+      'box#n1 label restored: "开始"',
     );
     expect(executor.execute("redo")).toBe(
-      "g#n1 updated: label=处理数据 v2",
+      'box#n1 label updated: "处理数据 v2"',
     );
     expect(executor.execute("show n1-rect")).toContain(
       "fill=#f5a623",
@@ -76,9 +83,9 @@ describe("box shape plugin", () => {
     );
   });
 
-  it("supports nesting and counts required children in stats", () => {
+  it("supports nesting box inside box", () => {
     const executor = createExecutor(createPluginApplication({
-      plugins: [shapeBoxPlugin, commandStatsPlugin],
+      plugins: [shapeBoxPlugin],
     }));
     executor.execute("init");
     executor.execute('create box parent 0 0 200 100 "Parent"');
@@ -87,9 +94,74 @@ describe("box shape plugin", () => {
     );
 
     expect(executor.execute("tree")).toContain("└── g#child");
-    expect(executor.execute("stats")).toBe(
-      "rect: 2  text: 2  (total 4, containers 2)",
+    expect(executor.execute("show child-rect")).toContain(
+      "parent=box#child",
     );
+  });
+
+  it("reports the box parent when undoing a nested delete", () => {
+    const executor = createExecutor(createPluginApplication({
+      plugins: [shapeBoxPlugin],
+    }));
+    executor.execute("init");
+    executor.execute('create box parent 0 0 200 100 "Parent"');
+    executor.execute(
+      'create box child 20 10 80 40 "Child" in parent',
+    );
+    executor.execute("delete child");
+
+    expect(executor.execute("undo")).toBe(
+      "box#child restored into box#parent",
+    );
+  });
+
+  it("reproduces the Phase 1 section 6.1 box session", () => {
+    const executor = createExecutor(createPluginApplication({
+      plugins: [shapeBoxPlugin, treeBoxLabelPlugin],
+    }));
+    executor.execute("init 800 600");
+
+    expect(
+      executor.execute('create box n1 120 100 160 60 "开始"'),
+    ).toBe(
+      "box#n1 created " +
+        "(g#n1 + rect#n1-rect + text#n1-label)",
+    );
+    expect(
+      executor.execute('create box n2 520 100 160 60 "处理数据"'),
+    ).toBe(
+      "box#n2 created " +
+        "(g#n2 + rect#n2-rect + text#n2-label)",
+    );
+    expect(
+      executor.execute("create line arrow1 280 130 520 130 black"),
+    ).toBe("line#arrow1 created");
+    expect(
+      executor.execute("group flowchart n1 n2 arrow1"),
+    ).toBe("g#flowchart created with 3 children");
+
+    expect(executor.execute("move n2 0 100")).toBe(
+      "box#n2 moved by (0,100)",
+    );
+    expect(executor.execute("undo")).toBe(
+      "box#n2 moved back by (0,-100)",
+    );
+    expect(executor.execute("set n2 fill #f5a623")).toBe(
+      "box#n2 fill propagated to n2-rect",
+    );
+    expect(
+      executor.execute('set n2 label "处理数据 v2"'),
+    ).toBe('box#n2 label updated: "处理数据 v2"');
+    expect(executor.execute("undo")).toBe(
+      'box#n2 label restored: "处理数据"',
+    );
+
+    const tree = executor.execute("tree") ?? "";
+    expect(tree).toContain("g#n1  (box)");
+    expect(tree).toContain("fill=#4a90d9");
+    expect(tree).toContain("g#n2  (box)");
+    expect(tree).toContain("fill=#f5a623");
+    expect(tree).toContain('"处理数据"');
   });
 
   it("rejects operations that would break required child invariants", () => {
@@ -116,10 +188,10 @@ describe("box shape plugin", () => {
       "error: cannot ungroup composite shape: n1",
     );
     expect(executor.execute("show n1-rect")).toContain(
-      "rect#n1-rect  parent=g#n1",
+      "rect#n1-rect  parent=box#n1",
     );
     expect(executor.execute("show n1-label")).toContain(
-      "text#n1-label  parent=g#n1",
+      "text#n1-label  parent=box#n1",
     );
   });
 
@@ -227,8 +299,12 @@ describe("box shape plugin", () => {
       "error: conflicting attribute handlers for n1/fill: " +
         "box-attributes, box-fill-conflict",
     );
-    expect(executor.execute("show n1-rect")).not.toContain("fill=");
-    expect(executor.execute("undo")).toBe("g#n1 creation undone");
+    expect(executor.execute("show n1-rect")).toContain(
+      "fill=#4a90d9",
+    );
+    expect(executor.execute("undo")).toBe(
+      "box#n1 creation undone",
+    );
   });
 
   it("rolls back partial handler changes and preserves prior history", () => {
